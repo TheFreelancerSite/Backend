@@ -11,11 +11,35 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      conversation.belongsTo(models.user, { foreignKey: 'senderId', as: 'sender' });
+      conversation.belongsTo(models.user, { foreignKey: 'receiverId', as: 'receiver' });
+
     }
   }
   conversation.init({
-    sender: DataTypes.STRING,
-    message_content: DataTypes.STRING
+    senderId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id',
+      },
+    },
+    receiverId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id',
+      },
+    },
+    message_content: DataTypes.STRING,
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id'
+      },
+    }
+
   }, {
     sequelize,
     modelName: 'conversation',
