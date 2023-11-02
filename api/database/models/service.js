@@ -5,7 +5,15 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class service extends Model {
     static associate(models) {
-      // define association here
+      service.belongsToMany(models.user, {
+        through: 'requests',
+        foreignKey: 'serviceId',
+      
+        otherKey: 'userId',
+      });
+      service.belongsTo(models.user, {
+        foreignKey: 'userId',
+      });
     }
   }
   service.init({
