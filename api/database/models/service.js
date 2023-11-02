@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'serviceId',
         otherKey: 'userId',
       });
+
+      service.belongsTo(models.user, {
+        foreignKey: 'userId',
+      });
     }
   }
   service.init({
