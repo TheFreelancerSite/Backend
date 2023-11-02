@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       service.belongsToMany(models.user, {
         through: 'requests',
         foreignKey: 'serviceId',
+      
         otherKey: 'userId',
       });
-
       service.belongsTo(models.user, {
         foreignKey: 'userId',
       });

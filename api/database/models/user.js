@@ -22,13 +22,13 @@ module.exports = (sequelize, DataTypes) => {
       });
       user.hasMany(models.Service, {
         foreignKey: 'userId',
-        as: 'services', 
+        as: 'services',
       });
     }
   }
   user.init(
     {
-      fullName: { type: DataTypes.STRING, allowNull: false },
+      userName: { type: DataTypes.STRING, allowNull: false },
       email: { type: DataTypes.STRING, allowNull: false },
       password: { type: DataTypes.STRING, allowNull: false },
       imgUrl: { type: DataTypes.STRING },
