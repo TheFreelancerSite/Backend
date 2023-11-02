@@ -4,7 +4,19 @@ require('dotenv').config();
 
 
 
-
+exports.generateToken = (userId, isSeller) => {
+  const token = jwt.sign(
+    {
+      userId,
+      isSeller,
+    },
+    process.env.jwt_Secret,
+    {
+      expiresIn: '1d',
+    }
+  );
+  return token;
+}
 
 
 exports.getTokenFromHeader = (req) => {
@@ -30,7 +42,7 @@ exports.getTokenFromHeader = (req) => {
     jwt.verify(token, process.env.jwt_Secret, (err) => {
       if (err) {
         console.log(err);
-        return sendErrorResponse(res, 401, err);
+        return res(401).send(err)
       }
       next();
     })
