@@ -2,7 +2,11 @@ const express = require("express");
 const serviceController = require("../controllers/services");
 const router = express.Router();
 
-router.get('/',serviceController.getAllServices)
-router.post("/add/:userId",serviceController.createService)
+const{ addServiceToUser, getServicesForUser, freelancerApplyForJob}=require("../controllers/service")
+
+router.get("/getserviceUser/:userId",getServicesForUser)
+router.post("/add/:userId",addServiceToUser)
+router.post("/freelancerApplyForJob/:userId/:serviceId", freelancerApplyForJob)
+
 
 module.exports = router;
