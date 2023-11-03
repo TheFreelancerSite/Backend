@@ -11,11 +11,30 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      
+   
+      
+      
     }
   }
   requests.init({
     user_service_status: DataTypes.STRING,
-    isCompleted: DataTypes.BOOLEAN
+    isCompleted: DataTypes.BOOLEAN,
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id'
+      },
+      serviceId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'service',
+          key: 'id'
+        }
+      }
+    },
+
   }, {
     sequelize,
     modelName: 'requests',
