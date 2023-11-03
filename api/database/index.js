@@ -9,10 +9,10 @@ if (process.env.NODE_ENV === 'development') {
     sequelize.options.logging = console.log;
   }
 const service = require('./models/service')(sequelize, Sequelize.DataTypes);
-const user = require('./models/user')(sequelize, Sequelize.DataTypes);
+const User = require('./models/user')(sequelize, Sequelize.DataTypes);
 
 module.exports = {
     sequelize,
     service,
-    user
+    User
   };
