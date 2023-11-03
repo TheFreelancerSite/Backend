@@ -63,7 +63,32 @@ module.exports = {
       res.status(500).send('An error occurred');
     }
   },
-  
+  //once the freelancer clicks on apply for job this is the controller that will handel it 
+  freelancerApplyForJob : async (req,res)=>{
+    const {userId,serviceId}=req.params
+    console.log("thiiiiiiiiiiiiiiiiiiiiiis is the serviceid ",serviceId)
+    try{
+      const userForService =await db.request.create({
+        user_service_status:"pending",
+        isCompleted:"false",
+        serviceId: serviceId,
+        userId:userId
+      })
+      res.status(201).json("user is Pending")
+    }catch(error){
+      res.json(error)
+      console.log(error)
+    }
+  },
+  //once the client accept the request this controller will handel it 
+  AcceptApply :async(req,res)=>{
+    
+  }
+
+
+
+
+
 
 
 };
