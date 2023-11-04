@@ -5,6 +5,7 @@ const { uploadImageToCloudinary } = require("../helpers/cloudinaryHelper");
 require("dotenv").config();
 const { Readable } = require("stream");
 
+
 module.exports = {
   createProfile: async (req, res) => {
     try {
@@ -75,7 +76,7 @@ module.exports = {
       if (!passwordMatch) {
         return res.status(401).json({ error: "Password is incorrect." });
       }
-      const token = generateToken(loginUser.id, loginUser.isSeller);
+      const token = generateToken(loginUser.id, loginUser.isSeller,loginUser.userName);
 
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace("-", "+").replace("_", "/");
