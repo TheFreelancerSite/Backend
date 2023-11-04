@@ -2,7 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const serviceRouter = require("./routes/service");
 const userRouter = require('./routes/api/user.routes')
-
+const multer =require('multer')
+const upload = multer({ dest: 'uploads/' });
 require('dotenv').config();
 
 

@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-
-const{ addServiceToUser, getServicesForUser, freelancerApplyForJob}=require("../controllers/service")
+const multer =require('multer')
+const upload = multer();
+const{ addServiceToUser, getServicesForUser, freelancerApplyForJob, getUserNameOfService}=require("../controllers/service")
 
 router.get("/getserviceUser/:userId",getServicesForUser)
-router.post("/add/:userId",addServiceToUser)
+router.get("/getUserNameOfService/:serviceId",getUserNameOfService)
+router.post("/add/:userId",upload.single('image'),addServiceToUser)
 router.post("/freelancerApplyForJob/:userId/:serviceId", freelancerApplyForJob)
 
 
