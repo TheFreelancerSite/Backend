@@ -78,7 +78,7 @@ module.exports = {
       if (!passwordMatch) {
         return res.status(401).json({ error: "Password is incorrect." });
       }
-      const token = generateToken(loginUser.id, loginUser.isSeller,loginUser.userName);
+      const token = generateToken(loginUser.id, loginUser.isSeller,loginUser.userName,loginUser.imgUrl);
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace("-", "+").replace("_", "/");
       const payload = JSON.parse(atob(base64));
