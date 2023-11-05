@@ -16,7 +16,7 @@ module.exports = {
             owner:"freelancer" ,
           },
         })
-        return res.status(200).json({clientServices})
+          return res.status(200).json(clientServices)
       } 
       catch(error){
         // console.log(error)
@@ -42,39 +42,47 @@ module.exports = {
     try {
       const { serviceId } = req.params;
   
-      // Find a single service by ID
       const service = await db.service.findOne({
         where: {
           id: serviceId
         }
       });
   
-      // Check if the service was found
       if (!service) {
         return res.status(404).json({ error: 'Service not found' });
       }
   
-      // Get the userId from the service
       const userId = service.userId;
   
-      // Find the user using the userId
       const user = await db.User.findOne({
         where: {
           id: userId
         }
       });
   
-      // Check if the user was found
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
   
-      // Send the user's data in the response
       res.status(200).json(user);
     } catch (error) {
       console.log(error);
       res.status(500).json(error);
     }
+  },
+  getServiceById :async(req,res)=>{
+    try{
+      const {serviceId}=req.params
+      const service = await db.service.findOne({
+        where :{
+          id:serviceId
+        }
+      })
+      res.status(200).json(service)
+    }catch(error){
+      res.status(500).json(error)
+    }
+
   },
   
   addServiceToUser: async (req, res) => {
@@ -124,22 +132,37 @@ module.exports = {
     }
   },
   //once the freelancer clicks on apply for job this is the controller that will handel it 
-  freelancerApplyForJob : async (req,res)=>{
-    const {userId,serviceId}=req.params
-    console.log("thiiiiiiiiiiiiiiiiiiiiiis is the serviceid ",serviceId)
-    try{
-      const userForService =await db.request.create({
-        user_service_status:"pending",
-        isCompleted:"false",
+  userApplyForJob: async (req, res) => {
+    const { userId, serviceId } = req.params;
+  
+    try {
+      const user = await db.User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+  
+      if (!user) {
+        return res.status(404).json("User not found");
+      }
+  
+      let requester = user.isSeller ? "client" : "freelancer";
+  
+      const userForService = await db.request.create({
+        user_service_status: "pending",
+        isCompleted: false, // Removed quotes to represent a boolean value
         serviceId: serviceId,
-        userId:userId
-      })
-      res.status(201).json("user is Pending")
-    }catch(error){
-      res.json(error)
-      console.log(error)
+        userId: userId,
+        requester: requester,
+      });
+  
+      res.status(201).json("User is Pending");
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json("An error occurred while processing the request.");
     }
   },
+  
   //once the client accept the request this controller will handel it 
   AcceptApply :async(req,res)=>{
     
