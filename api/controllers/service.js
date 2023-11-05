@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const db = require('../database/index');
 const cloudinary =require ("../utils/cloudinary")
 const {Readable}=require('stream')
@@ -84,6 +85,7 @@ module.exports = {
     }
 
   },
+
   
   addServiceToUser: async (req, res) => {
     try {
@@ -162,16 +164,49 @@ module.exports = {
       res.status(500).json("An error occurred while processing the request.");
     }
   },
+
+  usersPending:async(req,res)=>{
+    const {serviceId}=req.params
+    try{
+       const usersForSercice =await db.request.findAll({where :{
+        serviceId:serviceId,
+        user_service_status :"pending"
+       }})
+       res.status(200).json(usersForSercice)
+    }catch(error){
+      console.log(error)
+      res.status(500).json(error)
+    }
+  },
   
   //once the client accept the request this controller will handel it 
-  AcceptApply :async(req,res)=>{
-    
+  AcceptApply: async (req, res) => {
+    try {
+      const { userId, serviceId } = req.params;
+      const pendingToBeAccepted = await db.request.findAll({
+        where: {
+          userId,
+          serviceId,
+        },
+      });
+  
+      if (pendingToBeAccepted.length > 0) {
+        // Assuming 'user_service_status' is the name of the column in your model
+        for (const request of pendingToBeAccepted) {
+          await request.update({
+            user_service_status: 'accepted',
+          });
+        }
+  
+        return res.status(200).json({ message: 'Requests have been accepted.' });
+      } else {
+        return res.status(404).json({ message: 'No pending requests found.' });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   }
+  
 
-
-
-
-
-
-
-};
+}
