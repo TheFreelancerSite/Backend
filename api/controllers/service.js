@@ -1,42 +1,47 @@
 const db = require('../database/index');
-
+const { Op } = require('sequelize')
 module.exports = {
+
   getServicesForUser: async (req, res) => {
+    const { userId } = req.params;
 
-    const { userId } = req.params
-    const user = await db.User.findOne({ where: { id: userId } });
-    // console.log("this is ",user.isSeller)
-    //if the isSeller is true it means that the user is a freelancer
+    try {
+      const user = await db.User.findOne({ where: { id: userId } });
+      const sellerUsers = await db.User.findAll({
+        attributes: ['id'],
+        where: {
+          isSeller: true
+        }
+      });
 
-    if (user.isSeller === true) {
-      try {
-        const clientServices = await db.service.findAll({
+      const sellerUserIds = sellerUsers.map(user => user.id);
+      const services = user.isSeller
+        ? await db.service.findAll({
+          attributes: { exclude: ['owner'] },
           where: {
-            owner: "client",
-          },
+            userId: {
+              [Op.notIn]: sellerUserIds
+            }
+          }
         })
-        return res.status(200).json(clientServices)
-      }
-      catch (error) {
-        console.log(error)
-        return res.status(500).json(error)
-      }
-
-    } else {
-      try {
-        const freelancerServices = await db.service.findAll({
+        : await db.service.findAll({
+          attributes: { exclude: ['owner'] },
           where: {
-            owner: "client",
-          },
-        })
-        return res.status(200).json(freelancerServices)
-      }
-      catch (error) {
-        // console.log(error)
-        return res.status(500).json(error)
-      }
+            userId: {
+              [Op.in]: sellerUserIds
+            }
+          }
+        });
+
+
+      return res.status(200).json(services);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
     }
   },
+
+
   addServiceToUser: async (req, res) => {
     const { userId } = req.params;
     const { title, category, description, deliveryTime, features1, features2, price } = req.body;
@@ -45,8 +50,8 @@ module.exports = {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
-    const features = `${features1}\n${features2}`; 
+
+    const features = `${features1}\n${features2}`;
 
     try {
       const service = await db.service.create({

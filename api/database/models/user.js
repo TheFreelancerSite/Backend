@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'receiver',
         foreignKey: 'receiverId',
       });
-      user.hasMany(models.Service, {
+      user.hasMany(models.service, {
         foreignKey: 'userId',
         as: 'services',
       });
