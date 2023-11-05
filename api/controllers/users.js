@@ -19,13 +19,16 @@ module.exports = {
 
       const hashpassword = await bcrypt.hash(req.body.password, 10);
 
+      console.log(req.file);
+
       if (req.file && req.file.buffer) {
         const imageBuffer = req.file.buffer;
         const imageStream = Readable.from(imageBuffer);
-
+       console.log(req.file.buffer);
         try {
           const cloudinaryResult = await uploadImageToCloudinary(imageStream);
 
+          console.log(cloudinaryResult  );
           const newuser = await User.create({
             userName: req.body.userName,
             email: req.body.email,
@@ -36,11 +39,10 @@ module.exports = {
             description: req.body.description,
             isSeller: req.body.isSeller,
           });
-
           res.status(201).json(newuser.email);
         } catch (error) {
           console.error("Error uploading image to Cloudinary:", error);
-          res.status(500).json({ error: "Image upload failed" });
+          res.status(500).json(error);
         }
       } else {
         const newuser = await User.create({
@@ -77,7 +79,6 @@ module.exports = {
         return res.status(401).json({ error: "Password is incorrect." });
       }
       const token = generateToken(loginUser.id, loginUser.isSeller,loginUser.userName);
-
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace("-", "+").replace("_", "/");
       const payload = JSON.parse(atob(base64));
@@ -85,16 +86,6 @@ module.exports = {
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
-    }
-  },
-
-  logout: async (req, res) => {
-    try {
-      localStorage.removeItem("token");
-      return res.status(200).send("User has been logged out.");
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("An error occurred during logout.");
     }
   },
 };
