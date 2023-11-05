@@ -4,6 +4,7 @@ const { generateToken } = require("../helpers/jwt.helper");
 const { uploadImageToCloudinary } = require("../helpers/cloudinaryHelper");
 require("dotenv").config();
 const { Readable } = require("stream");
+const db = require('../database/index');
 
 
 module.exports = {
@@ -95,6 +96,20 @@ module.exports = {
     } catch (error) {
       console.error(error);
       res.status(500).send("An error occurred during logout.");
+    }
+  },
+  getUser : async(req,res)=>{
+    try {
+      const {userId}=req.params
+      const user = await db.User.findOne({
+        where:{
+          id :userId,
+        }
+      }) 
+      res.status(200).json(user)
+    }catch(error){
+      res.status(500).json(error)
+      console.log(error)
     }
   },
 };
