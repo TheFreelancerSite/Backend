@@ -4,11 +4,13 @@ require('dotenv').config();
 
 
 
-exports.generateToken = (userId, isSeller) => {
+exports.generateToken = (userId, isSeller,userName,imgUrl) => {
   const token = jwt.sign(
     {
       userId,
       isSeller,
+      userName,
+      imgUrl,
     },
     process.env.jwt_Secret,
     {

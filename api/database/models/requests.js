@@ -26,18 +26,21 @@ module.exports = (sequelize, DataTypes) => {
         model: 'user',
         key: 'id'
       },
-      serviceId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: 'service',
-          key: 'id'
-        }
-      }
     },
-
+    serviceId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'service',
+        key: 'id'
+      },
+    },
+    requester: {
+      type: DataTypes.STRING,
+    },
   }, {
     sequelize,
     modelName: 'requests',
   });
+  
   return requests;
 };
