@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const db = require('../database/index');
 const cloudinary = require("../utils/cloudinary")
 const { Readable } = require('stream')
@@ -205,33 +206,7 @@ module.exports = {
 
 
 
-// searchForServices: async (req, res) => {
-//   const { userId, services } = req.params
 
-//   try {
-//     const user = await db.User.findOne({
-//       where: {
-//         id: userId,
-//       },
-//     });
-//     if (!user) {
-//       return res.status(404).json("User not found");
-//     }
-//     let requester = user.isSeller ? "client" : "freelancer";
-
-//     const userForService = await db.request.create({
-//       user_service_status: "pending",
-//       isCompleted: false, // Removed quotes to represent a boolean value
-//       serviceId: serviceId,
-//       userId: userId,
-//       requester: requester,
-//     });
-//     res.status(201).json("User is Pending");
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json("An error occurred while processing the request.");
-//   }
-//   }
 
 
 
