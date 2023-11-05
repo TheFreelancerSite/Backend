@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const db = require('../database/index');
 const cloudinary =require ("../utils/cloudinary")
 const {Readable}=require('stream')
@@ -160,6 +161,19 @@ module.exports = {
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json("An error occurred while processing the request.");
+    }
+  },
+
+  usersPending:async(req,res)=>{
+    const {serviceId}=req.params
+    try{
+       const usersForSercice =await db.request.findAll({where :{
+        serviceId:serviceId,
+       }})
+       res.status(200).json(usersForSercice)
+    }catch(error){
+      console.log(error)
+      res.status(500).json(error)
     }
   },
   
