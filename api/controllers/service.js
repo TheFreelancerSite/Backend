@@ -113,7 +113,8 @@ module.exports = {
             category,
             description,
             deliveryTime,
-            features,
+            features1,
+            features2,
             price,
             userId,
             job_img: result.secure_url,
@@ -168,33 +169,114 @@ module.exports = {
   searchForServices: async (req, res) => {
     const search = req.body.search;
     const { userId } = req.params;
+
     try {
-      const user = await db.User.findOne({ where: { id: userId } });
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
+        const user = await db.User.findOne({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
-      let query = {
-        where: {
-          [Op.or]: [
-            { title: { [Op.like]: `%${search}%` } },
-            { category: { [Op.like]: `%${search}%` } },
-            { description: { [Op.like]: `%${search}%` } },
-            { deliveryTime: { [Op.like]: `%${search}%` } },
-            { price: { [Op.like]: `%${search}%` } },
-          ],
-        },
-      };
+        const whereCondition = {
+            [Op.or]: [
+                { title: { [Op.like]: `%${search}%` } },
+                { category: { [Op.like]: `%${search}%` } },
+                { description: { [Op.like]: `%${search}%` } },
+                { price: { [Op.like]: `%${search}%` } },
+                { deliveryTime: { [Op.like]: `%${search}%` } },
+            ],
+        };
 
-      if (user.isSeller) {
-        query.where.owner = "freelancer";
-      } else {
-        query.where.owner = "client";
-      }
-      const services = await db.service.findAll(query);
-      res.status(200).json(services);
+        if (!isNaN(parseFloat(search))) {
+            whereCondition.price = parseFloat(search);
+        }
+
+        if (user.isSeller) {
+            whereCondition.owner = "freelancer";
+        } else {
+            whereCondition.owner = "client";
+        }
+
+        const services = await db.service.findAll({ where: whereCondition });
+        res.status(200).json(services);
     } catch (err) {
-      res.status(500).json({ status: false, message: err.message });
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+},
+
+
+  userApplyForJob: async (req, res) => {
+    const { userId, serviceId } = req.params;
+
+    try {
+      const user = await db.User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json("User not found");
+      }
+
+      let requester = user.isSeller ? "client" : "freelancer";
+
+      const userForService = await db.request.create({
+        user_service_status: "pending",
+        isCompleted: false, // Removed quotes to represent a boolean value
+        serviceId: serviceId,
+        userId: userId,
+        requester: requester,
+      });
+
+      res.status(201).json("User is Pending");
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json("An error occurred while processing the request.");
+    }
+  },
+  usersPending: async (req, res) => {
+    const { serviceId } = req.params
+    try {
+      const usersForSercice = await db.request.findAll({
+        where: {
+          serviceId: serviceId,
+          user_service_status: "pending"
+        }
+      })
+      res.status(200).json(usersForSercice)
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(error)
+    }
+  },
+
+  //once the client accept the request this controller will handel it 
+  AcceptApply: async (req, res) => {
+    try {
+      const { userId, serviceId } = req.params;
+      const pendingToBeAccepted = await db.request.findAll({
+        where: {
+          userId,
+          serviceId,
+        },
+      });
+
+      if (pendingToBeAccepted.length > 0) {
+        // Assuming 'user_service_status' is the name of the column in your model
+        for (const request of pendingToBeAccepted) {
+          await request.update({
+            user_service_status: 'accepted',
+          });
+        }
+
+        return res.status(200).json({ message: 'Requests have been accepted.' });
+      } else {
+        return res.status(404).json({ message: 'No pending requests found.' });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
   }
 
