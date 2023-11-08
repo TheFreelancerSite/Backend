@@ -5,8 +5,9 @@ const multer = require('multer');
 const { adminAuthenticated } = require('../../middlewares/Auth.middlewares');
 
 
-router.post('/admin/login',authenticateAdmin)
-router.use(adminAuthenticated); 
-
+router.post('/login', adminAuthenticated, (req, res) => {
+    // Handle the successful login here, and you can access the authenticated admin via req.admin
+    res.json({ message: 'Authentication successful', admin: req.admin });
+  });
 
 module.exports = router;

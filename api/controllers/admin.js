@@ -1,17 +1,17 @@
 // admin.controller.js
 const bcrypt = require('bcrypt');
-const Admin = require('../models/admin.model');
+const db = require('../database/index');
+
 
 
 
 async function authenticateAdmin(email, password) {
-  const admin = await Admin.findOne({ where: { email } });
+  const admin = await db.admin.findOne({ where: { email ,} });
   if (!admin) {
     return null; // Admin not found
   }
 
-  const isPasswordValid = await bcrypt.compare(password, admin.password);
-  if (!isPasswordValid) {
+  if (admin.password !== password) {
     return null; // Invalid password
   }
 
