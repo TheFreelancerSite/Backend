@@ -34,7 +34,15 @@ module.exports.clientAuthenticated = (req, res, next) => {
 
   verifyToken(token, res, next);
 };
-
+module.exports.adminAuthenticated = (req, res, next) => {
+  if (!token) {
+    return res.status(401).send('Access denied')
+  }
+  const admin = decodeToken(token);
+  if (!admin) {
+    return res.status(403).send('Access denied')
+  }
+};
 
 
 
