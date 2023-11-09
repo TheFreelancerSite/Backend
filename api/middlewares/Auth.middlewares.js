@@ -35,26 +35,26 @@ module.exports.clientAuthenticated = (req, res, next) => {
 
   verifyToken(token, res, next);
 };
-module.exports.adminAuthenticated = async (req, res, next) => {
-  const { email, password } = req.body;
+// module.exports.adminAuthenticated = async (req, res, next) => {
+//   const { email, password } = req.body;
 
-  // Check if the email and password are provided
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
-  }
+//   // Check if the email and password are provided
+//   if (!email || !password) {
+//     return res.status(400).json({ error: 'Email and password are required' });
+//   }
 
-  const admin = await authenticateAdmin(email, password);
+//   const admin = await authenticateAdmin(email, password);
 
-  if (!admin) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
+//   if (!admin) {
+//     return res.status(401).json({ error: 'Invalid credentials' });
+//   }
 
-  // If authentication is successful, you can store user information in the request for later use.
-  req.admin = admin;
+//   // If authentication is successful, you can store user information in the request for later use.
+//   req.admin = admin;
 
-  // Continue to the next middleware or route handler
-  next();
-};
+//   // Continue to the next middleware or route handler
+//   next();
+// };
 
 
 

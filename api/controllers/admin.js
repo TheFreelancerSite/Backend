@@ -1,22 +1,32 @@
 // admin.controller.js
-const bcrypt = require('bcrypt');
+
 const db = require('../database/index');
 
 
 
 
-async function authenticateAdmin(email, password) {
-  const admin = await db.admin.findOne({ where: { email ,} });
-  if (!admin) {
-    return null; // Admin not found
-  }
+async function authenticateAdmin(req, res) {
+  const { email, password } = req.body;
+  try {
+    const admin = await db.admin.findOne({ where:{email} });
 
-  if (admin.password !== password) {
-    return null; // Invalid password
-  }
+    if (!admin) {
+      return res.status(400).json({ error: "Admin doesn't exist" });
+    }
 
-  return admin; // Authentication successful
+    if (admin.password !== password) {
+      console.log("oyyyyyyyy",admin.password)
+      console.log("wiiiiiiw",password)
+      return res.status(400).json({ error: "Email or password incorrect" });
+    }
+    return res.status(201).json(admin); // Authentication successful
+
+  } catch (error) {
+    console.error("Error authenticating admin:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
+
 
 
 module.exports = {
