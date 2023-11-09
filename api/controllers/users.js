@@ -4,8 +4,7 @@ const { generateToken } = require("../helpers/jwt.helper");
 const { uploadImageToCloudinary } = require("../helpers/cloudinaryHelper");
 require("dotenv").config();
 const { Readable } = require("stream");
-const db = require('../database/index');
-
+const db = require("../database/index");
 
 module.exports = {
   createProfile: async (req, res) => {
@@ -25,11 +24,11 @@ module.exports = {
       if (req.file && req.file.buffer) {
         const imageBuffer = req.file.buffer;
         const imageStream = Readable.from(imageBuffer);
-       console.log(req.file.buffer);
+        console.log(req.file.buffer);
         try {
           const cloudinaryResult = await uploadImageToCloudinary(imageStream);
 
-          console.log(cloudinaryResult  );
+          console.log(cloudinaryResult);
           const newuser = await User.create({
             userName: req.body.userName,
             email: req.body.email,
@@ -78,7 +77,12 @@ module.exports = {
       if (!passwordMatch) {
         return res.status(401).json({ error: "Password is incorrect." });
       }
-      const token = generateToken(loginUser.id, loginUser.isSeller,loginUser.userName,loginUser.imgUrl);
+      const token = generateToken(
+        loginUser.id,
+        loginUser.isSeller,
+        loginUser.userName,
+        loginUser.imgUrl
+      );
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace("-", "+").replace("_", "/");
       const payload = JSON.parse(atob(base64));
@@ -89,18 +93,56 @@ module.exports = {
     }
   },
 
-  getUser : async(req,res)=>{
+  getUser: async (req, res) => {
     try {
-      const {userId}=req.params
+      const { userId } = req.params;
       const user = await db.User.findOne({
-        where:{
-          id :userId,
+        where: {
+          id: userId,
+        },
+      });
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(error);
+      console.log(error);
+    }
+  },
+
+  updateUserProfile: async (req, res) => {
+    const { userId } = req.params;
+    const { userName, email, password, description, country, phone } = req.body;
+    const image = req.file;
+
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      user.userName = userName;
+      user.email = email;
+      user.password = password;
+      user.description = description;
+      user.country = country;
+      user.phone = phone;
+
+
+      if (image) {
+        try {
+          const result = await uploadImageToCloudinary(image.buffer);
+          user.image = result.secure_url;
+        } catch (error) {
+          console.error("Image upload error:", error);
+          return res.status(500).json({ error: "Image upload to Cloudinary failed" });
         }
-      }) 
-      res.status(200).json(user)
-    }catch(error){
-      res.status(500).json(error)
-      console.log(error)
+      }
+
+      await user.save();
+
+      return res.json({ message: "User profile updated successfully" });
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error" });
     }
   },
 
