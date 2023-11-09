@@ -39,6 +39,44 @@ module.exports = {
       }
     }
   },
+
+  getServicesForSpecificUser :async(req,res)=>{
+    const {userId}=req.params
+    const user= await db.User.findOne({where :{id : userId}});
+    // console.log("this is ",user.isSeller)
+    //if the isSeller is true it means that the user is a freelancer
+
+    if(user.isSeller===true){
+      try{
+        const clientServices = await db.service.findAll({
+          where:{
+            owner:"client" ,
+            userId:userId
+          },
+        })
+          return res.status(200).json(clientServices)
+      } 
+      catch(error){
+        // console.log(error)
+        return res.status(500).json(error)
+      }
+  
+    }else {
+      try{
+        const freelancerServices = await db.service.findAll({
+          where:{
+            owner:"freelancer" ,
+            userId:userId
+          },
+        })
+        return res.status(200).json(freelancerServices)
+      } 
+      catch(error){
+        // console.log(error)
+        return res.status(500).json(error)
+      }
+    }
+  },
   getUserNameOfService: async (req, res) => {
     try {
       const { serviceId } = req.params;
@@ -90,7 +128,7 @@ module.exports = {
   addServiceToUser: async (req, res) => {
     try {
     const { userId } = req.params;
-    const { title, category, description, deliveryTime,job_img, features1, features2, price,owner } = req.body;
+    const { title, category, description, deliveryTime,job_img, feautures, price,owner } = req.body;
     console.log("this is req.file  ",req.file)
     const user = await db.User.findOne({ where: { id: userId } });
     if (!user) {
@@ -112,8 +150,7 @@ module.exports = {
         category,
         description,
         deliveryTime,
-        features1,
-        features2,
+        feautures,
         price,
         userId,
         job_img:result.secure_url,
@@ -205,6 +242,34 @@ module.exports = {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  isServiceHaveAcceptedUser :async (req,res)=>{
+    const {serviceId}=req.params
+    try{
+      const isAcctept = await db.request.findOne({where : {
+        serviceId,
+        user_service_status :"accepted"
+      }})
+      isAcctept ? res.json({message:true}) : res.json({message : false})
+    }catch(error){
+      console.log(error)
+    }
+  },
+
+  getTheAcceptedUser :async (req,res)=>{
+    const {serviceId}=req.params
+    try{
+      const userAccepted = await db.request.findOne({where:{
+        serviceId,
+        user_service_status :"accepted"
+      }})
+      userAccepted ?res.status(200).json({message :true ,userAccept:userAccepted}):res.json({message:false})
+      
+    }catch(error){
+      console.log(error)
+      res.status(500).json(error)
     }
   }
   
