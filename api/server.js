@@ -29,9 +29,7 @@ require("./controllers/google-auth")(passport);
 app.use("/service", serviceRouter);
 app.use("/user", userRouter);
 app.use("/", googleRouer);
-app.listen(3000, () => {
-  console.log("server lisnting ");
-});
+
 
 app.listen(3000,()=>{
     console.log ("server lisnting ")
