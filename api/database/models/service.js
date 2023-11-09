@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false, 
     },
-    features: DataTypes.STRING,
+    feautures: DataTypes.STRING,
     serviceReviews: DataTypes.STRING,
     description: DataTypes.STRING,
     owner:DataTypes.STRING,
