@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       conversation.belongsTo(models.user, { foreignKey: 'senderId', as: 'sender' });
       conversation.belongsTo(models.user, { foreignKey: 'receiverId', as: 'receiver' });
-
+      conversation.hasMany(models.message , {foreignKey: 'conversationId',as :'messages'})
     }
   }
   conversation.init({
@@ -32,13 +32,13 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     message_content: DataTypes.STRING,
-    userId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'user',
-        key: 'id'
-      },
-    }
+    // userId: {
+    //   type: DataTypes.INTEGER,
+    //   references: {
+    //     model: 'user',
+    //     key: 'id'
+    //   },
+    // }
 
   }, {
     sequelize,
