@@ -4,8 +4,8 @@ const { Op } = require('sequelize');
 module.exports = {
     createConversation: async (req, res) => {
         try {
-            const { userId } = req.params;
-            const receiverId = req.body.receiverId;
+            const { userId ,receiverId} = req.params;
+            
 
             const existingConversation = await db.conversation.findOne({
                 where: {
@@ -25,7 +25,7 @@ module.exports = {
 
             const newConversation = new db.conversation({
                 senderId: userId,
-                receiverId: req.body.receiverId,
+                receiverId: receiverId,
                 message_content: req.body.message_content,
             });
             await newConversation.save();
