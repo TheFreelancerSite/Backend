@@ -5,6 +5,7 @@ const passport = require("passport");
 const serviceRouter = require("./routes/service");
 const userRouter = require("./routes/api/user.routes");
 const googleRouer = require("./routes/api/google.routes");
+const paymentRoutes = require('./routes/api/paypal.routes');
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
@@ -37,7 +38,7 @@ require("./controllers/google-auth")(passport);
 app.use("/service", serviceRouter);
 app.use("/user", userRouter);
 app.use("/", googleRouer);
-
+app.use("/paypal", paymentRoutes)
 
 app.listen(3000,()=>{
     console.log ("server lisnting ")
