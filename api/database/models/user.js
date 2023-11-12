@@ -14,12 +14,13 @@
           as: 'sender',
           foreignKey: 'senderId',
         });
-
+        
         user.belongsToMany(models.user, {
           through: 'conversation',
           as: 'receiver',
           foreignKey: 'receiverId',
         });
+        
         user.hasMany(models.service, {
           foreignKey: 'userId',
           as: 'services',
