@@ -1,13 +1,20 @@
 // admin.routes.js
 const router = require('express').Router();
-const { authenticateAdmin, getUserById, getclients, getfreelancer } = require('../../controllers/admin');
+const { authenticateAdmin, getUserById, getclients, getfreelancer, deleteUser, getAdmin, updateAdmin } = require('../../controllers/admin');
+const { adminAuthenticated } = require('../../middlewares/Auth.middlewares')
+const multer = require('multer');
+const upload = multer();
+
 
 
 
 router.post('/login', authenticateAdmin);
-router.get('/user', getUserById)
-router.get('/clients', getclients)
-router.get('/freelancers', getfreelancer)
+router.put('/update', adminAuthenticated, upload.single('image'), updateAdmin);
+router.get('/user', adminAuthenticated, getUserById)
+router.get('/clients', adminAuthenticated, getclients)
+router.get('/freelancers', adminAuthenticated, getfreelancer)
+router.delete('/delete/:userid', adminAuthenticated, deleteUser)
+router.get('/profile', adminAuthenticated, getAdmin)
 
 
 
