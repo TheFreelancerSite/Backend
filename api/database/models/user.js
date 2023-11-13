@@ -36,7 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       phone: { type: DataTypes.STRING },
       description: { type: DataTypes.STRING, allowNull: true },
       isSeller: { type: DataTypes.BOOLEAN,  defaultValue: false},
-      google_id :{type : DataTypes.STRING}
+      google_id :{type : DataTypes.STRING},
+      googleToken : {type : DataTypes.STRING}
     },
     {
       sequelize,

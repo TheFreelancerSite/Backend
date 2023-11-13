@@ -9,7 +9,7 @@ module.exports = {
     const user= await db.User.findOne({where :{id : userId}});
     // console.log("this is ",user.isSeller)
     //if the isSeller is true it means that the user is a freelancer
-
+if(user){
     if(user.isSeller===true){
       try{
         const clientServices = await db.service.findAll({
@@ -23,7 +23,7 @@ module.exports = {
         // console.log(error)
         return res.status(500).json(error)
       }
-  
+    }
     }else {
       try{
         const freelancerServices = await db.service.findAll({
