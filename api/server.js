@@ -4,6 +4,8 @@ const session = require("express-session");
 const passport = require("passport");
 const serviceRouter = require("./routes/service");
 const userRouter = require("./routes/api/user.routes");
+const conversationRouter=require("./routes/conversation")
+const messageRouter =require('./routes/message')
 const googleRouer = require("./routes/api/google.routes");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -21,6 +23,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 
+
 const sessionSecret = process.env.SESSION_SECRET || "secret";
 
 app.use(
@@ -31,11 +34,14 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-require("./controllers/google-auth")(passport);
+
+// app.use(passport.initialize());
+// require("./controllers/google-auth")(passport);
 
 app.use("/service", serviceRouter);
 app.use("/user", userRouter);
+app.use("/conversation",conversationRouter)
+app.use("/message",messageRouter)
 app.use("/", googleRouer);
 
 
