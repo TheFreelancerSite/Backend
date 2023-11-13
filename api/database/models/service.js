@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false, 
     },
-    totalStars: DataTypes.INTEGER,
+    totalStars: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0, 
+    },
     category: DataTypes.STRING,
     price: {
       type: DataTypes.FLOAT,

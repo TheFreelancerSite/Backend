@@ -1,30 +1,32 @@
-"use strict";
-const { Model } = require("sequelize");
-module.exports = (sequelize, DataTypes) => {
-  class user extends Model {
-    static associate(models) {
-      user.belongsToMany(models.service, {
-        through: 'requests',
-        foreignKey: 'userId',
-        otherKey: 'serviceId',
-      });
+  "use strict";
+  const { Model } = require("sequelize");
+  module.exports = (sequelize, DataTypes) => {
+    class user extends Model {
+      static associate(models) {
+        user.belongsToMany(models.service, {
+          through: 'requests',
+          foreignKey: 'userId',
+          otherKey: 'serviceId',
+        });
 
-      user.belongsToMany(models.user, {
-        through: 'conversation',
-        as: 'sender',
-        foreignKey: 'senderId',
-      });
-
-      user.belongsToMany(models.user, {
-        through: 'conversation',
-        as: 'receiver',
-        foreignKey: 'receiverId',
-      });
-      user.hasMany(models.service, {
-        foreignKey: 'userId',
-        as: 'services',
-      });
-    }
+        user.belongsToMany(models.user, {
+          through: 'conversation',
+          as: 'sender',
+          foreignKey: 'senderId',
+        });
+        
+        user.belongsToMany(models.user, {
+          through: 'conversation',
+          as: 'receiver',
+          foreignKey: 'receiverId',
+        });
+        
+        user.hasMany(models.service, {
+          foreignKey: 'userId',
+          as: 'services',
+        });
+      }
+    
   }
   user.init(
     {
