@@ -5,6 +5,7 @@ module.exports = {
         try {
             const {  content } = req.body;
             const {conversationId , senderId} =req.params
+         
             // Create a new message
             const newMessage = await db.message.create({
                 conversationId,
