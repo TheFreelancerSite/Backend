@@ -50,6 +50,7 @@ module.exports = {
             userId:userId
           },
         })
+        // await requestedService =await db.request.find
           return res.status(200).json(clientServices)
       } 
       catch(error){
@@ -269,7 +270,79 @@ module.exports = {
     }
   },
 
-  //join table user , service,request 
-  
+  //when the user clicks on valiate 
+  updatingRequestWhenServiceFinish : async(req,res)=>{
+
+    try {
+      const {serviceId ,userId}=req.params
+      const serviceOnRequest = await db.request.findOne({
+        where: {
+          serviceId,
+          userId,
+          user_service_status: "accepted",
+        },
+      });
+    
+      if (serviceOnRequest) {
+        await serviceOnRequest.update({ isCompleted: true });
+    
+        res.status(200).json({ message: 'Request updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Request not found' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  },
+
+  isUserCompleteJob :async(req,res)=>{
+    const {userId,serviceId}=req.params
+    try{
+      const jobCompleted =await db.request.findOne({
+        where :{
+          userId,
+          serviceId,
+        }
+      })
+      jobCompleted.isCompleted ? res.json(true) :res.json(false)
+    }catch(error){
+      res.status(500).json(error)
+      console.group(error)
+    }
+  },
+  updateThestars :async(req,res)=>{
+    const {serviceId} =req.params
+    const {stars}=req.body
+    try{
+      const service =await db.service.findByPk(serviceId)
+      if(service){
+        await service.update({totalStars:stars})
+        res.status(200).json({message :"update success"})
+      }else{
+        res.status(404).json({message :"service not found"})
+      }
+    }
+    catch(error){
+      res.status(500).json(error)
+    }
+  },
+
+  giveReview :async(req,res)=>{
+    const {serviceId}=req.params
+    const {feedback} =req.body
+    try{
+      const service =await db.service.findByPk(serviceId)
+      if(service){
+        await service.update({serviceReviews:feedback})
+        res.status(200).json({message :"update feedback success"})
+      }else{
+        res.status(404).json({message :"service not found"})
+      }
+    }catch(error){
+      res.status(500).json(error)
+    }
+  }
+
 
 }
