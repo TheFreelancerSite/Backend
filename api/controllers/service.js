@@ -50,9 +50,11 @@ module.exports = {
             owner: "client",
             userId: userId,
           },
-        });
-        return res.status(200).json(clientServices);
-      } catch (error) {
+        })
+        // await requestedService =await db.request.find
+          return res.status(200).json(clientServices)
+      } 
+      catch(error){
         // console.log(error)
         return res.status(500).json(error);
       }
@@ -282,45 +284,79 @@ module.exports = {
     }
   },
 
-  //join table user , service,request
+  //when the user clicks on valiate 
+  updatingRequestWhenServiceFinish : async(req,res)=>{
 
-  // // Assuming 'Freelancer' is a specific role
-  addRating: async (req, res) => {
-    const { serviceId } = req.params;
-    const { totalStars, userId } = req.body;
-  
     try {
-      const user = await db.User.findByPk(userId);
-  
-  
-      const service = await db.service.findByPk(serviceId);
-  
-      if (!service) {
-        return res.status(404).json({ error: "Service not found" });
+      const {serviceId ,userId}=req.params
+      const serviceOnRequest = await db.request.findOne({
+        where: {
+          serviceId,
+          userId,
+          user_service_status: "accepted",
+        },
+      });
+    
+      if (serviceOnRequest) {
+        await serviceOnRequest.update({ isCompleted: true });
+    
+        res.status(200).json({ message: 'Request updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Request not found' });
       }
-  
-      // Create a new rating and associate it with the service
-      const newRating = await db.Rating.create({ totalStars, userId, serviceId });
-  
-      if (!newRating) {
-        return res.status(500).json({ error: "Unable to add rating" });
-      }
-  
-      // Fetch all ratings for the service
-      const ratings = await db.Rating.findAll({ where: { serviceId } });
-  
-      // Calculate average rating
-      const totalRatings = ratings.length;
-      const totalStars = ratings.reduce((acc, curr) => acc + curr.rating, 0);
-      const averageRating = totalRatings > 0 ? totalStars / totalRatings : 0;
-  
-      // Update the service's totalStars with the new average
-      service.totalStars = averageRating;
-      await service.save();
-  
-      return res.status(200).json({ message: "Rating added successfully" });
     } catch (error) {
-      return res.status(500).json({ error: "Unable to add rating" });
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  },
+
+  isUserCompleteJob :async(req,res)=>{
+    const {userId,serviceId}=req.params
+    try{
+      const jobCompleted =await db.request.findOne({
+        where :{
+          userId,
+          serviceId,
+        }
+      })
+      jobCompleted.isCompleted ? res.json(true) :res.json(false)
+    }catch(error){
+      res.status(500).json(error)
+      console.group(error)
+    }
+  },
+  updateThestars :async(req,res)=>{
+    const {serviceId} =req.params
+    const {stars}=req.body
+    try{
+      const service =await db.service.findByPk(serviceId)
+      if(service){
+        await service.update({totalStars:stars})
+        res.status(200).json({message :"update success"})
+      }else{
+        res.status(404).json({message :"service not found"})
+      }
+    }
+    catch(error){
+      res.status(500).json(error)
+    }
+  },
+
+  giveReview :async(req,res)=>{
+    const {serviceId}=req.params
+    const {feedback} =req.body
+    try{
+      const service =await db.service.findByPk(serviceId)
+      if(service){
+        await service.update({serviceReviews:feedback})
+        res.status(200).json({message :"update feedback success"})
+      }else{
+        res.status(404).json({message :"service not found"})
+      }
+    }catch(error){
+      res.status(500).json(error)
     }
   }
-};
+
+
+}
