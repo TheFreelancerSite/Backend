@@ -46,6 +46,7 @@ module.exports.adminAuthenticated = async (req, res, next) => {
   if (payload.role !== "admin") {
     return res.status(403).send('Access denied')
   }
+
   verifyToken(token, res, next);
 };
 

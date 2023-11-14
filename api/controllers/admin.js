@@ -70,7 +70,7 @@ async function getclients(req, res) {
 async function getfreelancer(req, res) {
   try {
 
-    const client = await db.User.findall({
+    const client = await db.User.findAll({
       where: {
         isSeller: true,
       }
@@ -183,6 +183,4 @@ module.exports = {
   deleteUser,
   getAdmin,
   updateAdmin
-
-
 };
