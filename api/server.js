@@ -25,7 +25,6 @@ app.use("/service",serviceRouter)
 app.use('/user' , userRouter )
 app.use('/admin', adminRouter)
 
-
 const sessionSecret = process.env.SESSION_SECRET || "secret";
 
 app.use(
@@ -36,16 +35,14 @@ app.use(
   })
 );
 
-
-// app.use(passport.initialize());
-// require("./controllers/google-auth")(passport);
+app.use(passport.initialize());
+require("./controllers/google-auth")(passport);
 
 app.use("/service", serviceRouter);
 app.use("/user", userRouter);
 app.use("/conversation",conversationRouter)
 app.use("/message",messageRouter)
 app.use("/", googleRouer);
-
 
 app.listen(3000,()=>{
     console.log ("server lisnting ")

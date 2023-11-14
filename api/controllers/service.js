@@ -1,13 +1,14 @@
-const db = require('../database/index');
-const cloudinary =require ("../utils/cloudinary")
-const {Readable}=require('stream')
+const db = require("../database/index");
+const cloudinary = require("../utils/cloudinary");
+const { Readable } = require("stream");
 
 module.exports = {
   getServicesForUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });
-  
-    if (user) { // Check if user is not null or undefined
+
+    if (user) {
+      // Check if user is not null or undefined
       if (user.isSeller === true) {
         try {
           const clientServices = await db.service.findAll({
@@ -36,18 +37,18 @@ module.exports = {
     }
   },
 
-  getServicesForSpecificUser :async(req,res)=>{
-    const {userId}=req.params
-    const user= await db.User.findOne({where :{id : userId}});
+  getServicesForSpecificUser: async (req, res) => {
+    const { userId } = req.params;
+    const user = await db.User.findOne({ where: { id: userId } });
     // console.log("this is ",user.isSeller)
     //if the isSeller is true it means that the user is a freelancer
 
-    if(user.isSeller===true){
-      try{
+    if (user.isSeller === true) {
+      try {
         const clientServices = await db.service.findAll({
-          where:{
-            owner:"client" ,
-            userId:userId
+          where: {
+            owner: "client",
+            userId: userId,
           },
         })
         // await requestedService =await db.request.find
@@ -55,135 +56,139 @@ module.exports = {
       } 
       catch(error){
         // console.log(error)
-        return res.status(500).json(error)
+        return res.status(500).json(error);
       }
-  
-    }else {
-      try{
+    } else {
+      try {
         const freelancerServices = await db.service.findAll({
-          where:{
-            owner:"freelancer" ,
-            userId:userId
+          where: {
+            owner: "freelancer",
+            userId: userId,
           },
-        })
-        return res.status(200).json(freelancerServices)
-      } 
-      catch(error){
+        });
+        return res.status(200).json(freelancerServices);
+      } catch (error) {
         // console.log(error)
-        return res.status(500).json(error)
+        return res.status(500).json(error);
       }
     }
   },
   getUserNameOfService: async (req, res) => {
     try {
       const { serviceId } = req.params;
-  
+
       const service = await db.service.findOne({
         where: {
-          id: serviceId
-        }
+          id: serviceId,
+        },
       });
-  
+
       if (!service) {
-        return res.status(404).json({ error: 'Service not found' });
+        return res.status(404).json({ error: "Service not found" });
       }
-  
+
       const userId = service.userId;
-  
+
       const user = await db.User.findOne({
         where: {
-          id: userId
-        }
+          id: userId,
+        },
       });
-  
+
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: "User not found" });
       }
-  
+
       res.status(200).json(user);
     } catch (error) {
       console.log(error);
       res.status(500).json(error);
     }
   },
-  getServiceById :async(req,res)=>{
-    try{
-      const {serviceId}=req.params
+  getServiceById: async (req, res) => {
+    try {
+      const { serviceId } = req.params;
       const service = await db.service.findOne({
-        where :{
-          id:serviceId
-        }
-      })
-      res.status(200).json(service)
-    }catch(error){
-      res.status(500).json(error)
+        where: {
+          id: serviceId,
+        },
+      });
+      res.status(200).json(service);
+    } catch (error) {
+      res.status(500).json(error);
     }
-
   },
 
-  
   addServiceToUser: async (req, res) => {
     try {
-    const { userId } = req.params;
-    const { title, category, description, deliveryTime,job_img, feautures, price,owner } = req.body;
-    console.log("this is req.file  ",req.file)
-    const user = await db.User.findOne({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    const imageBuffer =req.file.buffer;
-    const imageStream=Readable.from(imageBuffer)
-    const cloudinaryResult =await cloudinary.uploader.upload_stream({
-      resource_type:'image'
-    },
-    async (error,result)=>{
-      if(error){
-        console.error("errro uploading img",error)
-        res.status(500).json({error :"Image upload failed"})
-      }
-      console.log(cloudinaryResult)
-      const service = await db.service.create({
+      const { userId } = req.params;
+      const {
         title,
         category,
         description,
         deliveryTime,
+        job_img,
         feautures,
         price,
-        userId,
-        job_img:result.secure_url,
-        owner
-      });
-      
-      res.status(201).json(service);
-    }
-    )
-    console.log("this is the userid",userId)
+        owner,
+      } = req.body;
+      console.log("this is req.file  ", req.file);
+      const user = await db.User.findOne({ where: { id: userId } });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const imageBuffer = req.file.buffer;
+      const imageStream = Readable.from(imageBuffer);
+      const cloudinaryResult = await cloudinary.uploader.upload_stream(
+        {
+          resource_type: "image",
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("errro uploading img", error);
+            res.status(500).json({ error: "Image upload failed" });
+          }
+          console.log(cloudinaryResult);
+          const service = await db.service.create({
+            title,
+            category,
+            description,
+            deliveryTime,
+            feautures,
+            price,
+            userId,
+            job_img: result.secure_url,
+            owner,
+          });
 
-   imageStream.pipe(cloudinaryResult)
+          res.status(201).json(service);
+        }
+      );
+      console.log("this is the userid", userId);
 
-
+      imageStream.pipe(cloudinaryResult);
     } catch (error) {
       console.log(error);
       res.status(500).send(error);
     }
   },
-  //once the freelancer clicks on apply for job this is the controller that will handel it 
+  //once the freelancer clicks on apply for job this is the controller that will handel it
   userApplyForJob: async (req, res) => {
     const { userId, serviceId } = req.params;
-  
+
     try {
       const user = await db.User.findOne({
         where: {
           id: userId,
         },
       });
-  
+
       if (!user) {
         return res.status(404).json("User not found");
       }
-  
+
       let requester = user.isSeller ? "client" : "freelancer";
-  
+
       const userForService = await db.request.create({
         user_service_status: "pending",
         isCompleted: false, // Removed quotes to represent a boolean value
@@ -191,7 +196,7 @@ module.exports = {
         userId: userId,
         requester: requester,
       });
-  
+
       res.status(201).json("User is Pending");
     } catch (error) {
       console.error("Error:", error);
@@ -199,21 +204,23 @@ module.exports = {
     }
   },
 
-  usersPending:async(req,res)=>{
-    const {serviceId}=req.params
-    try{
-       const usersForSercice =await db.request.findAll({where :{
-        serviceId:serviceId,
-        user_service_status :"pending"
-       }})
-       res.status(200).json(usersForSercice)
-    }catch(error){
-      console.log(error)
-      res.status(500).json(error)
+  usersPending: async (req, res) => {
+    const { serviceId } = req.params;
+    try {
+      const usersForSercice = await db.request.findAll({
+        where: {
+          serviceId: serviceId,
+          user_service_status: "pending",
+        },
+      });
+      res.status(200).json(usersForSercice);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
-  
-  //once the client accept the request this controller will handel it 
+
+  //once the client accept the request this controller will handel it
   AcceptApply: async (req, res) => {
     try {
       const { userId, serviceId } = req.params;
@@ -223,50 +230,57 @@ module.exports = {
           serviceId,
         },
       });
-  
+
       if (pendingToBeAccepted.length > 0) {
         // Assuming 'user_service_status' is the name of the column in your model
         for (const request of pendingToBeAccepted) {
           await request.update({
-            user_service_status: 'accepted',
+            user_service_status: "accepted",
           });
         }
-  
-        return res.status(200).json({ message: 'Requests have been accepted.' });
+
+        return res
+          .status(200)
+          .json({ message: "Requests have been accepted." });
       } else {
-        return res.status(404).json({ message: 'No pending requests found.' });
+        return res.status(404).json({ message: "No pending requests found." });
       }
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 
-  isServiceHaveAcceptedUser :async (req,res)=>{
-    const {serviceId}=req.params
-    try{
-      const isAcctept = await db.request.findOne({where : {
-        serviceId,
-        user_service_status :"accepted"
-      }})
-      isAcctept ? res.json({message:true}) : res.json({message : false})
-    }catch(error){
-      console.log(error)
+  isServiceHaveAcceptedUser: async (req, res) => {
+    const { serviceId } = req.params;
+    try {
+      const isAcctept = await db.request.findOne({
+        where: {
+          serviceId,
+          user_service_status: "accepted",
+        },
+      });
+      isAcctept ? res.json({ message: true }) : res.json({ message: false });
+    } catch (error) {
+      console.log(error);
     }
   },
 
-  getTheAcceptedUser :async (req,res)=>{
-    const {serviceId}=req.params
-    try{
-      const userAccepted = await db.request.findOne({where:{
-        serviceId,
-        user_service_status :"accepted"
-      }})
-      userAccepted ?res.status(200).json({message :true ,userAccept:userAccepted}):res.json({message:false})
-      
-    }catch(error){
-      console.log(error)
-      res.status(500).json(error)
+  getTheAcceptedUser: async (req, res) => {
+    const { serviceId } = req.params;
+    try {
+      const userAccepted = await db.request.findOne({
+        where: {
+          serviceId,
+          user_service_status: "accepted",
+        },
+      });
+      userAccepted
+        ? res.status(200).json({ message: true, userAccept: userAccepted })
+        : res.json({ message: false });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
