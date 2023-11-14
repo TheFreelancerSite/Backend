@@ -7,42 +7,54 @@ module.exports = {
   getServicesForUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });
-
+  
     if (user) {
-      // Check if user is not null or undefined
-      if (user.isSeller === true) {
-        try {
-          const clientServices = await db.service.findAll({
+      try {
+        let services;
+  
+        if (user.isSeller === true) {
+          // For freelancers
+          services = await db.service.findAll({
             where: {
               owner: "freelancer",
             },
           });
-          return res.status(200).json(clientServices);
-        } catch (error) {
-          return res.status(500).json(error);
-        }
-      } else {
-        try {
-          const freelancerServices = await db.service.findAll({
+        } else {
+          // For clients
+          services = await db.service.findAll({
             where: {
               owner: "client",
             },
           });
-          return res.status(200).json(freelancerServices);
-        } catch (error) {
-          return res.status(500).json(error);
         }
+  
+        const requestsData = await db.request.findAll({
+          attributes: ['serviceId', 'userId'],
+        });
+  
+        const existingRequestCombinations = new Set(
+          requestsData.map((request) => `${request.serviceId}-${request.userId}`)
+        );
+  
+        const filteredServices = services.filter((service) => {
+          const serviceUserCombination = `${service.id}-${userId}`;
+          return !existingRequestCombinations.has(serviceUserCombination);
+        });
+  
+        return res.status(200).json(filteredServices);
+      } catch (error) {
+        return res.status(500).json(error);
       }
     } else {
       return res.status(404).json({ error: "User not found" });
     }
   },
+  
 
   getServicesForSpecificUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });
-    // console.log("this is ",user.isSeller)
-    //if the isSeller is true it means that the user is a freelancer
+
 
     if (user.isSeller === true) {
       try {
@@ -52,11 +64,9 @@ module.exports = {
             userId: userId,
           },
         })
-        // await requestedService =await db.request.find
           return res.status(200).json(clientServices)
       } 
       catch(error){
-        // console.log(error)
         return res.status(500).json(error);
       }
     } else {
@@ -69,7 +79,6 @@ module.exports = {
         });
         return res.status(200).json(freelancerServices);
       } catch (error) {
-        // console.log(error)
         return res.status(500).json(error);
       }
     }
@@ -391,7 +400,69 @@ module.exports = {
       console.error("Error calculating average rating:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
+  },
+
+  getAllReviewsForUser: async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const userServices = await db.service.findAll({
+        where: {
+          userId: userId,
+          
+        },
+      });
+  
+      const serviceIds = userServices.map((service) => service.id);
+      const serviceRequests = await db.request.findAll({
+        where: {
+          serviceId: serviceIds,
+          user_service_status: 'accepted', 
+        },
+      });
+  
+      const reviewerUserIds = serviceRequests.map((request) => request.userId);
+      const reviewers = await db.User.findAll({
+        where: {
+          id: reviewerUserIds,
+        },
+      });
+  
+      const reviews = serviceRequests.map((request) => {
+        const reviewer = reviewers.find((user) => user.id === request.userId);
+        const service = userServices.find((service) => service.id === request.serviceId);
+  
+        return {
+          
+            id: reviewer.id,
+            userName: reviewer.userName,
+            email: reviewer.email,
+            imgUrl : reviewer.imgUrl,
+            serviceReviews: service.serviceReviews,
+          
+          // review: {
+          //   user_service_status: request.user_service_status,
+          //   isCompleted: request.isCompleted,
+          // },
+          // serviceReview: {
+          //   serviceId: service.id,
+          //   title: service.title,
+          //   totalStars: service.totalStars,
+          //   serviceReviews: service.serviceReviews,
+          // },
+        };
+      });
+  
+      res.status(200).json(reviews);
+    } catch (error) {
+      console.error('Error fetching user reviews:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
+  
+  
+  
+  
   
   
 
