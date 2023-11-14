@@ -8,7 +8,6 @@
           foreignKey: 'userId',
           otherKey: 'serviceId',
         });
-
         user.belongsToMany(models.user, {
           through: 'conversation',
           as: 'sender',
@@ -26,27 +25,26 @@
           as: 'services',
         });
       }
-    
-  }
-  user.init(
-    {
-      userName: { type: DataTypes.STRING, allowNull: false },
-      email: { type: DataTypes.STRING, allowNull: false },
-      password: { type: DataTypes.STRING, allowNull: true },
-      imgUrl: { type: DataTypes.STRING },
-      country: { type: DataTypes.STRING , allowNull: false },
-      phone: { type: DataTypes.STRING },
-      description: { type: DataTypes.STRING, allowNull: true },
-      isSeller: { type: DataTypes.BOOLEAN,  defaultValue: false},
-      google_id :{type : DataTypes.STRING},
-      googleToken : {type : DataTypes.STRING}
-    },
-    {
-      sequelize,
-      modelName: "user",
     }
-  );
-  return user;
-};
+    user.init(
+      {
+        userName: { type: DataTypes.STRING, allowNull: false },
+        email: { type: DataTypes.STRING, allowNull: false },
+        password: { type: DataTypes.STRING, allowNull: true },
+        imgUrl: { type: DataTypes.STRING },
+        country: { type: DataTypes.STRING , allowNull: false },
+        phone: { type: DataTypes.STRING },
+        description: { type: DataTypes.STRING, allowNull: true },
+        isSeller: { type: DataTypes.BOOLEAN,  defaultValue: false},
+        google_id :{type : DataTypes.STRING},
+        googleToken : {type : DataTypes.STRING}
+      },
+      {
+        sequelize,
+        modelName: "user",
+      }
+    );
+    return user;
+  };
 
 

@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.get("/:userId",getConversations)
-router.post("/create/:userId",createConversation)
+router.post("/create/:userId/:receiverId",createConversation)
 router.get("/single/:id",getSingleConversation)
 // router.get("/:id",updateConversations)
 

@@ -108,42 +108,63 @@ module.exports = {
     }
   },
 
-  updateUserProfile: async (req, res) => {
-    const { userId } = req.params;
-    const { userName, email, password, description, country, phone } = req.body;
-    const image = req.file;
-
+  updateProfile: async (req, res) => {
     try {
-      const user = await User.findById(userId);
-
+      const {userId} = req.params
+      // Find the user by ID or unique identifier
+      const user = await User.findOne({
+        where: { id: userId }, // Adjust this based on your user identification method
+      });
+  
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-
-      user.userName = userName;
-      user.email = email;
-      user.password = password;
-      user.description = description;
-      user.country = country;
-      user.phone = phone;
-
-
-      if (image) {
-        try {
-          const result = await uploadImageToCloudinary(image.buffer);
-          user.image = result.secure_url;
-        } catch (error) {
-          console.error("Image upload error:", error);
-          return res.status(500).json({ error: "Image upload to Cloudinary failed" });
-        }
+  
+      // Update the user's information
+      if (req.body.password) {
+        req.body.password = await bcrypt.hash(req.body.password, 10);
       }
-
-      await user.save();
-
-      return res.json({ message: "User profile updated successfully" });
+  
+      // Check if there's a new profile image to update
+      if (req.file && req.file.buffer) {
+        const imageBuffer = req.file.buffer;
+        const imageStream = Readable.from(imageBuffer);
+      
+        try {
+          const cloudinaryResult = await uploadImageToCloudinary(imageStream);
+      
+          // Update user information including the new image URL
+          user.userName = req.body.userName || user.userName;
+          user.imgUrl = cloudinaryResult.secure_url;
+          user.email = req.body.email || user.email;
+          user.country = req.body.country || user.country;
+          user.phone = req.body.phone || user.phone;
+          user.description = req.body.description || user.description;
+      
+          await user.save();
+      
+          return res.status(200).json({ message: "Profile updated successfully" });
+        } catch (error) {
+          console.error("Error uploading image to Cloudinary:", error);
+          return res.status(500).json({ error: "Failed to update profile image" });
+        }
+      } else {
+        // Update user information without a new image
+        user.userName = req.body.userName || user.userName;
+        user.email = req.body.email || user.email;
+        user.country = req.body.country || user.country;
+        user.phone = req.body.phone || user.phone;
+        user.description = req.body.description || user.description;
+      
+        await user.save();
+      
+        return res.status(200).json({ message: "Profile updated successfully" });
+      }
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ error: "Internal server error" });
     }
-  },
+  }
+  
 
 }
