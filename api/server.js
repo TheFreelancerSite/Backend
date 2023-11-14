@@ -25,18 +25,18 @@ app.use("/service",serviceRouter)
 app.use('/user' , userRouter )
 app.use('/admin', adminRouter)
 
-const sessionSecret = process.env.SESSION_SECRET || "secret";
+// const sessionSecret = process.env.SESSION_SECRET || "secret";
 
-app.use(
-  session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+// app.use(
+//   session({
+//     secret: sessionSecret,
+//     resave: false,
+//     saveUninitialized: false,
+//   })
+// );
 
-app.use(passport.initialize());
-require("./controllers/google-auth")(passport);
+// app.use(passport.initialize());
+// require("./controllers/google-auth")(passport);
 
 app.use("/service", serviceRouter);
 app.use("/user", userRouter);

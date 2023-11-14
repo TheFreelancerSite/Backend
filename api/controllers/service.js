@@ -1,6 +1,7 @@
 const db = require("../database/index");
 const cloudinary = require("../utils/cloudinary");
 const { Readable } = require("stream");
+const { Sequelize, Op } = require("sequelize");
 
 module.exports = {
   getServicesForUser: async (req, res) => {
@@ -356,7 +357,42 @@ module.exports = {
     }catch(error){
       res.status(500).json(error)
     }
-  }
+  },
 
+  averageRatingStars: async (req, res) => {
+    try {
+      const { userId } = req.params;
+  
+      const user = await db.User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const result = await db.service.findOne({
+        attributes: [
+          [Sequelize.fn("AVG", Sequelize.col("totalStars")), "averageRating"],
+        ],
+        where: {
+          userId: {
+            [Op.eq]: userId,
+          },
+        },
+      });
+  
+      const averageRating = result.dataValues.averageRating;
+  
+      res.status(200).json({ averageRating });
+    } catch (error) {
+      console.error("Error calculating average rating:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+  
+  
 
 }
