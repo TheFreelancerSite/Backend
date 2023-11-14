@@ -104,7 +104,7 @@ async function deleteUser(req, res) {
 }
 async function getAdmin(req, res) {
   try {
-    const { adminId } = req.body;
+    const { adminId } = req.params;
     if (!adminId) {
       return res.status(400).json({ error: 'admin not found' });
     }
@@ -173,6 +173,16 @@ async function updateAdmin(req, res) {
     res.status(500).json({ error: err });
   }
 }
+async function logoutAdmin(req, res) {
+  // Extract the token from the Authorization header
+  const token = req.headers.authorization.split(' ')[1];
+
+  // In a real-world scenario, you might want to add the token to a blacklist
+  // or use another mechanism to invalidate it.
+
+  res.status(200).json({ message: 'Logout successful' });
+}
+
 
 
 module.exports = {

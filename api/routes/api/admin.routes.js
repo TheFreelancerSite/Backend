@@ -14,7 +14,7 @@ router.get('/user', adminAuthenticated, getUserById)
 router.get('/clients', adminAuthenticated, getclients)
 router.get('/freelancers', adminAuthenticated, getfreelancer)
 router.delete('/delete/:userid', adminAuthenticated, deleteUser)
-router.get('/profile', adminAuthenticated, getAdmin)
+router.get('/profile/:adminId', adminAuthenticated, getAdmin)
 
 
 
