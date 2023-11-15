@@ -174,14 +174,24 @@ async function updateAdmin(req, res) {
   }
 }
 async function logoutAdmin(req, res) {
-  // Extract the token from the Authorization header
-  const token = req.headers.authorization.split(' ')[1];
+  try {
+    // Extract the token from the Authorization header
+    const token = req.headers.authorization.split(' ')[1];
 
-  // In a real-world scenario, you might want to add the token to a blacklist
-  // or use another mechanism to invalidate it.
+    // Add the token to a blacklist or perform any other token invalidation mechanism
+    // This could involve storing the invalidated token in a database or cache
+    // In this example, I'm using a simple in-memory set to store invalidated tokens
+    invalidatedTokens.add(token);
 
-  res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 }
+
+// Set to store invalidated tokens (in-memory, replace with a persistent store in production)
+const invalidatedTokens = new Set();
 
 
 
@@ -192,5 +202,6 @@ module.exports = {
   getfreelancer,
   deleteUser,
   getAdmin,
-  updateAdmin
+  updateAdmin,
+  logoutAdmin
 };
