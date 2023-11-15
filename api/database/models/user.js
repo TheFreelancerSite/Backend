@@ -8,7 +8,6 @@
           foreignKey: 'userId',
           otherKey: 'serviceId',
         });
-
         user.belongsToMany(models.user, {
           through: 'conversation',
           as: 'sender',
@@ -25,6 +24,16 @@
           foreignKey: 'userId',
           as: 'services',
         });
+
+        user.hasMany(models.review, {
+          foreignKey: 'reviewedUserId',
+          as: 'receivedReviews',
+        });
+        
+        user.hasMany(models.review, {
+          foreignKey: 'reviewerId',
+          as: 'givenReviews',
+        });
       }
     }
     user.init(
@@ -37,7 +46,8 @@
         phone: { type: DataTypes.STRING },
         description: { type: DataTypes.STRING, allowNull: true },
         isSeller: { type: DataTypes.BOOLEAN,  defaultValue: false},
-        google_id :{type : DataTypes.STRING}
+        google_id :{type : DataTypes.STRING},
+        googleToken : {type : DataTypes.STRING}
       },
       {
         sequelize,
