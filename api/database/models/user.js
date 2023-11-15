@@ -3,6 +3,7 @@
   module.exports = (sequelize, DataTypes) => {
     class user extends Model {
       static associate(models) {
+        user.hasMany(models.reports, { foreignKey: 'userId', as: 'reports' });
         user.belongsToMany(models.service, {
           through: 'requests',
           foreignKey: 'userId',
@@ -24,6 +25,7 @@
           foreignKey: 'userId',
           as: 'services',
         });
+        
       }
     }
     user.init(
