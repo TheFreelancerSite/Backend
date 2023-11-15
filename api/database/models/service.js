@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class service extends Model {
     static associate(models) {
-      service.belongsTo(models.user, { foreignKey: 'userId' }); // Add this association
+      service.belongsTo(models.user, { foreignKey: 'userId' ,as:'owner' }); // Add this association
       service.belongsToMany(models.user, {
         through: 'requests',
         foreignKey: 'serviceId',
@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false, 
     },
-    totalStars: DataTypes.INTEGER,
+    totalStars: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0, 
+    },
     category: DataTypes.STRING,
     price: {
       type: DataTypes.FLOAT,

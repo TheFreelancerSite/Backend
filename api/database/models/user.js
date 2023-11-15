@@ -24,6 +24,16 @@
           foreignKey: 'userId',
           as: 'services',
         });
+
+        user.hasMany(models.review, {
+          foreignKey: 'reviewedUserId',
+          as: 'receivedReviews',
+        });
+        
+        user.hasMany(models.review, {
+          foreignKey: 'reviewerId',
+          as: 'givenReviews',
+        });
       }
     }
     user.init(
