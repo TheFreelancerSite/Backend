@@ -50,7 +50,6 @@ module.exports = {
     }
   },
   
-
   getServicesForSpecificUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });

@@ -1,6 +1,6 @@
 // admin.routes.js
 const router = require('express').Router();
-const { authenticateAdmin, getUserById, getclients, getfreelancer, deleteUser, getAdmin, updateAdmin, logoutAdmin } = require('../../controllers/admin');
+const { authenticateAdmin, getUserById, getclients, getfreelancer, deleteUser, getAdmin, updateAdmin, logoutAdmin, search } = require('../../controllers/admin');
 const { adminAuthenticated } = require('../../middlewares/Auth.middlewares')
 const multer = require('multer');
 const upload = multer();
@@ -14,8 +14,10 @@ router.get('/user/:userId', adminAuthenticated, getUserById)
 router.get('/clients', adminAuthenticated, getclients)
 router.get('/freelancers', adminAuthenticated, getfreelancer)
 router.delete('/delete/:userId', adminAuthenticated, deleteUser)
-router.get('/profile/:adminId',adminAuthenticated, getAdmin)
+router.get('/profile/:adminId', adminAuthenticated, getAdmin)
 router.post('/logout', adminAuthenticated, logoutAdmin)
+router.post('/search', search)
+
 
 
 

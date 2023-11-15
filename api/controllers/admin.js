@@ -3,6 +3,7 @@
 const db = require('../database/index');
 const { where } = require('sequelize');
 const { generateTokenForAdmin } = require('../helpers/jwt.helper')
+const { Op } = require("sequelize");
 
 
 
@@ -37,7 +38,6 @@ async function authenticateAdmin(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-
 async function getUserById(req, res) {
   try {
     const { userId } = req.params
@@ -54,7 +54,6 @@ async function getUserById(req, res) {
 }
 async function getclients(req, res) {
   try {
-
     const client = await db.User.findAll({
       where: {
         isSeller: false,
@@ -192,7 +191,31 @@ async function logoutAdmin(req, res) {
 
 // Set to store invalidated tokens (in-memory, replace with a persistent store in production)
 const invalidatedTokens = new Set();
+async function search(req, res) {
+  let search = req.body.search;
+  let regex = `%${search}%`; // SQL pattern for case-insensitive search
 
+  try {
+    let query = {
+      where: {
+        [Op.or]: [
+          { userName: { [Op.like]: regex } },
+          { country: { [Op.like]: regex } },
+          { phone: { [Op.like]: regex } },
+        ],
+      }
+    };
+
+    const users = await db.User.findAll(query);
+    if (users.length > 0) {
+      res.status(200).json({ status: true, data: users });
+    } else {
+      res.status(201).json({ status: false, message: 'No user found' });
+    }
+  } catch (err) {
+    res.status(500).json({ status: false, message: err.message });
+  }
+};
 
 
 module.exports = {
@@ -203,5 +226,6 @@ module.exports = {
   deleteUser,
   getAdmin,
   updateAdmin,
-  logoutAdmin
+  logoutAdmin,
+  search
 };
