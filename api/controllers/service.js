@@ -404,61 +404,63 @@ module.exports = {
 
   getAllReviewsForUser: async (req, res) => {
     const { userId } = req.params;
-  
+
     try {
-      const userServices = await db.service.findAll({
-        where: {
-          userId: userId,
-          
-        },
-      });
-  
-      const serviceIds = userServices.map((service) => service.id);
-      const serviceRequests = await db.request.findAll({
-        where: {
-          serviceId: serviceIds,
-          user_service_status: 'accepted', 
-        },
-      });
-  
-      const reviewerUserIds = serviceRequests.map((request) => request.userId);
-      const reviewers = await db.User.findAll({
-        where: {
-          id: reviewerUserIds,
-        },
-      });
-  
-      const reviews = serviceRequests.map((request) => {
-        const reviewer = reviewers.find((user) => user.id === request.userId);
-        const service = userServices.find((service) => service.id === request.serviceId);
-  
-        return {
-          
-            id: reviewer.id,
-            userName: reviewer.userName,
-            email: reviewer.email,
-            imgUrl : reviewer.imgUrl,
-            serviceReviews: service.serviceReviews,
-          
-          // review: {
-          //   user_service_status: request.user_service_status,
-          //   isCompleted: request.isCompleted,
-          // },
-          // serviceReview: {
-          //   serviceId: service.id,
-          //   title: service.title,
-          //   totalStars: service.totalStars,
-          //   serviceReviews: service.serviceReviews,
-          // },
-        };
-      });
-  
-      res.status(200).json(reviews);
+        // Find services provided by the user
+        const userServices = await db.service.findAll({
+            where: {
+                userId: userId,
+            },
+        });
+
+        // Extract service IDs
+        const serviceIds = userServices.map((service) => service.id);
+
+        // Find service requests for those services
+        const serviceRequests = await db.request.findAll({
+            where: {
+                serviceId: serviceIds,
+                user_service_status: 'accepted',
+                isCompleted: true,
+            },
+        });
+
+        // Extract reviewer user IDs
+        const reviewerUserIds = [...new Set(serviceRequests.map((request) => request.userId))];
+
+        // Fetch reviewer details from the User table
+        const reviewers = await db.User.findAll({
+            where: {
+                id: reviewerUserIds,
+            },
+        });
+
+        // Map service requests to reviews
+        const reviews = serviceRequests.map((request) => {
+            const reviewer = reviewers.find((user) => user.id === request.userId);
+            const service = userServices.find((service) => service.id === request.serviceId);
+
+            return {
+                id: reviewer.id,
+                userName: reviewer.userName,
+                email: reviewer.email,
+                imgUrl: reviewer.imgUrl,
+                serviceReviews: service.serviceReviews, // Adjust this line based on your data model
+                serviceReviewer :reviewer
+            };
+        });
+
+        res.status(200).json(reviews);
     } catch (error) {
-      console.error('Error fetching user reviews:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error fetching user reviews:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  }
+}
+
+
+  
+  
+  
   
   
   
