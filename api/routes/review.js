@@ -4,4 +4,4 @@ const router = express.Router();
 
 router.post("/addReview/:reviewerId/:reviewedUserId",addReview)
 router.get("/getReviewsByUserId/:userId",getReviewsByUserId)
-module.exports = router;
+module.exports = router;    
