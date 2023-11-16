@@ -16,6 +16,7 @@ const conversation=require("./models/conversation")(sequelize,Sequelize.DataType
 const message =require('./models/message')(sequelize,Sequelize.DataTypes);
 const reports = require('./models/reports')(sequelize,Sequelize.DataTypes);
 
+const review =require('./models/review')(sequelize,Sequelize.DataTypes);
 module.exports = {
     sequelize,
     service,
@@ -23,4 +24,7 @@ module.exports = {
     request,
     admin,
     reports,
+    conversation,
+    message,
+    review
   };

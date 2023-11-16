@@ -73,6 +73,10 @@ module.exports = {
       if (!User) {
         return res.status(400).json({ error: "User Not Found." });
       }
+      if(loginUser.banned === true){
+        res.redirect("http://localhost:5173/login")
+        return res.status(401).json({ error: "User is banned." });
+      }
       const passwordMatch = await bcrypt.compare(password, loginUser.password);
       if (!passwordMatch) {
         return res.status(401).json({ error: "Password is incorrect." });
@@ -164,7 +168,52 @@ module.exports = {
       console.error(error);
       return res.status(500).json({ error: "Internal server error" });
     }
-  }
+  },
+
+
+  banUserById: async (req, res) => {
+    const {userId} = req.params
+
+    try {
+      const foundUser = await User.findByPk(userId);
+      if (!foundUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      foundUser.banned = true;
+      foundUser.banExpires = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      await foundUser.save();
+
+      return res.status(200).json({ message: 'User banned successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  unbanUserById: async (req, res) => {
+    const {userId} = req.params
+
+    try {
+      
+      const foundUser = await User.findByPk(userId);
+
+      if (!foundUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      foundUser.banned = false;
+      foundUser.banExpires = null;
+
+      await foundUser.save();
+
+      return res.status(200).json({ message: 'User unbanned successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  },
   
 
 }
