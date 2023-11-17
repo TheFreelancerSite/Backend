@@ -10,7 +10,7 @@ const upload = multer();
 
 router.post('/login', authenticateAdmin);
 router.put('/update', adminAuthenticated, upload.single('image'), updateAdmin);
-router.get('/user/:userId', adminAuthenticated, getUserById)
+router.get('/user/:userId', getUserById)
 router.get('/clients', adminAuthenticated, getclients)
 router.get('/freelancers', adminAuthenticated, getfreelancer)
 router.delete('/delete/:userId', adminAuthenticated, deleteUser)

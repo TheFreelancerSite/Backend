@@ -1,6 +1,6 @@
 // admin.controller.js
 
-const db = require('../database/index');
+const {User, admin, service}= require('../database/index');
 const { where } = require('sequelize');
 const { generateTokenForAdmin } = require('../helpers/jwt.helper')
 const { Op } = require("sequelize");
@@ -12,26 +12,26 @@ async function authenticateAdmin(req, res) {
   console.log("request", req.body);
 
   try {
-    const admin = await db.admin.findOne({ where: { email } });
+    const admins = await admin.findOne({ where: { email } });
 
-    if (!admin) {
+    if (!admins) {
       return res.status(400).json({ error: "Admin doesn't exist" });
     }
 
-    if (admin.password !== password) {
+    if (admins.password !== password) {
       return res.status(400).json({ error: "Email or password incorrect" });
     }
     const token = generateTokenForAdmin(
-      admin.id,
-      admin.role,
-      admin.email,
-      admin.imgUrl
+      admins.id,
+      admins.role,
+      admins.email,
+      admins.imgUrl
     );
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace("-", "+").replace("_", "/");
     const payload = JSON.parse(atob(base64));
     console.log(payload)
-    res.status(200).json({ admin, payload, token, message: "succeeded" });
+    res.status(200).json({ admins, payload, token, message: "succeeded" });
 
   } catch (error) {
     console.error("Error authenticating admin:", error);
@@ -41,7 +41,7 @@ async function authenticateAdmin(req, res) {
 async function getUserById(req, res) {
   try {
     const { userId } = req.params
-    const user = await db.User.find({
+    const user = await User.findOne({
       where: {
         id: userId,
       }
@@ -54,7 +54,7 @@ async function getUserById(req, res) {
 }
 async function getclients(req, res) {
   try {
-    const client = await db.User.findAll({
+    const client = await User.findAll({
       where: {
         isSeller: false,
       }
@@ -69,7 +69,7 @@ async function getclients(req, res) {
 async function getfreelancer(req, res) {
   try {
 
-    const client = await db.User.findAll({
+    const client = await User.findAll({
       where: {
         isSeller: true,
       }
@@ -88,7 +88,7 @@ async function deleteUser(req, res) {
       return res.status(400).json({ error: 'User ID is required in the request body' });
     }
 
-    const user = await db.User.findOne({ where: { id: userId } });
+    const user = await User.findOne({ where: { id: userId } });
 
     if (user) {
       await user.destroy();
@@ -109,7 +109,7 @@ async function getAdmin(req, res) {
     }
 
     // Replace the following line with your actual code to fetch admin data by ID from the database
-    const admin = await db.admin.findOne({ where: { id: adminId } });
+    const admin = await admin.findOne({ where: { id: adminId } });
 
     if (!admin) {
       return res.status(404).json({ error: 'Admin not found' });
@@ -125,7 +125,7 @@ async function getAdmin(req, res) {
 async function updateAdmin(req, res) {
   try {
     const { email, password } = req.body;
-    const admin = await db.admin.findOne({ where: { role: "admin" } });
+    const admin = await admin.findOne({ where: { role: "admin" } });
     let newPassword = null;
 
     if (password && !email) {
@@ -206,7 +206,7 @@ async function search(req, res) {
       }
     };
 
-    const users = await db.User.findAll(query);
+    const users = await User.findAll(query);
     if (users.length > 0) {
       res.status(200).json({ status: true, data: users });
     } else {
@@ -218,6 +218,8 @@ async function search(req, res) {
 };
 
 
+
+
 module.exports = {
   authenticateAdmin,
   getUserById,
@@ -227,5 +229,7 @@ module.exports = {
   getAdmin,
   updateAdmin,
   logoutAdmin,
-  search
+  search,
+  
+  
 };
