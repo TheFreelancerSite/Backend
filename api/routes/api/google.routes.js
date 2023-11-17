@@ -23,8 +23,6 @@ router.get(
       };
       if(user.isSeller === false){
       res.redirect(`http://localhost:5173/freelancerHomePage?user=${user.userId}&isSeller=${user.isSeller}&imgUrl=${user.imgUrl}&userName=${user.userName}`)
-      }else if(user.isSeller === true){
-        res.redirect(`http://localhost:5173/clientHomePage?user=${user.userId}&isSeller=${user.isSeller}&imgUrl=${user.imgUrl}&userName=${user.userName}`)
       }
     } else {
       res.redirect("http://localhost:5173/login");
