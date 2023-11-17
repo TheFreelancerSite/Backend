@@ -10,6 +10,7 @@ const conversationRouter=require("./routes/conversation")
 const messageRouter =require('./routes/message')
 const adminRouter= require('./routes/api/admin.routes')
 const reviewRouter =require('./routes/review')
+const paymentRouter =require('./routes/paymentRoute')
 const googleRouer = require("./routes/api/google.routes");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -43,6 +44,7 @@ app.use("/user", userRouter);
 app.use("/conversation",conversationRouter)
 app.use("/message",messageRouter)
 app.use("/review",reviewRouter)
+app.use("/payment",paymentRouter)
 app.use("/", googleRouer);
 
 app.listen(3000,()=>{
