@@ -8,6 +8,14 @@ const sequelize = new Sequelize("freelance", "abdou", "admin" , {
 if (process.env.NODE_ENV === 'development') {
     sequelize.options.logging = console.log;
   }
+  // sequelize.sync({ force: false })
+  // .then(() => {
+  //   console.log('Database and tables synced');
+  // })
+  // .catch((error) => {
+  //   console.error('Error syncing database and tables:', error);
+  // });
+  
 const service = require('./models/service')(sequelize, Sequelize.DataTypes);
 const User = require('./models/user')(sequelize, Sequelize.DataTypes);
 const request =require("./models/requests")(sequelize, Sequelize.DataTypes);

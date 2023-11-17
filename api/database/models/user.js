@@ -3,7 +3,7 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     static associate(models) {
-      user.hasMany(models.reports, { foreignKey: "userId", as: "reports" });
+      user.hasMany(models.reports, { foreignKey: 'userId'});
       user.belongsToMany(models.service, {
         through: "requests",
         foreignKey: "userId",
@@ -23,15 +23,14 @@ module.exports = (sequelize, DataTypes) => {
 
       user.hasMany(models.service, {
         foreignKey: "userId",
-        as: "services",
       });
 
-      user.hasMany(models.review, {
+      user.hasMany(models.Review, {
         foreignKey: "reviewedUserId",
         as: "receivedReviews",
       });
 
-      user.hasMany(models.review, {
+      user.hasMany(models.Review, {
         foreignKey: "reviewerId",
         as: "givenReviews",
       });
