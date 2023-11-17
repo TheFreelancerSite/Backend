@@ -1,8 +1,8 @@
 const router = require('express').Router();
-
 const { signin, createProfile, getUser,updateProfile} = require('../../controllers/users');
 const multer = require('multer');
 const upload = multer();
+
 
 router.get('/getUser/:userId',getUser)
 router.post('/signin', signin);

@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@stripe/stripe-js": "^2.1.11",
     "atob": "^2.1.2",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -31,7 +32,8 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "paypal-rest-sdk": "^1.8.1",
-    "sequelize": "^6.33.0"
+    "sequelize": "^6.33.0",
+    "stripe": "^14.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
