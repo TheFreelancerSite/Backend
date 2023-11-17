@@ -25,6 +25,7 @@ const message =require('./models/message')(sequelize,Sequelize.DataTypes);
 const reports = require('./models/reports')(sequelize,Sequelize.DataTypes);
 
 const review =require('./models/review')(sequelize,Sequelize.DataTypes);
+const payment =require('./models/payment')(sequelize,Sequelize.DataTypes);
 module.exports = {
     sequelize,
     service,
@@ -34,5 +35,6 @@ module.exports = {
     reports,
     conversation,
     message,
-    review
+    review,
+    payment
   };

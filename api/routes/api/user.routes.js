@@ -4,6 +4,7 @@ const { signin, createProfile, getUser,updateProfile,banUserById,unbanUserById} 
 const multer = require('multer');
 const upload = multer();
 
+
 router.get('/getUser/:userId',getUser)
 router.post('/signin', signin);
 router.post('/signup', upload.single('image'), createProfile); 

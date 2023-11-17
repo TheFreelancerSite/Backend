@@ -12,6 +12,7 @@ const adminRouter= require('./routes/api/admin.routes')
 const reviewRouter =require('./routes/review')
 const googleRouter = require('./routes/api/google.routes')
 const reportRouter = require("./routes/api/report.routes")
+const paymentRouter =require('./routes/paymentRoute')
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
@@ -45,6 +46,7 @@ app.use("/message",messageRouter)
 app.use("/", googleRouter);
 app.use("/send", reportRouter);
 app.use("/review",reviewRouter)
+app.use("/payment",paymentRouter)
 
 app.listen(3000,()=>{
     console.log ("server lisnting ")
