@@ -7,11 +7,11 @@ module.exports = {
   getServicesForUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });
-  
+
     if (user) {
       try {
         let services;
-  
+
         if (user.isSeller === true) {
           // For freelancers
           services = await db.service.findAll({
@@ -27,20 +27,20 @@ module.exports = {
             },
           });
         }
-  
+
         const requestsData = await db.request.findAll({
           attributes: ['serviceId', 'userId'],
         });
-  
+
         const existingRequestCombinations = new Set(
           requestsData.map((request) => `${request.serviceId}-${request.userId}`)
         );
-  
+
         const filteredServices = services.filter((service) => {
           const serviceUserCombination = `${service.id}-${userId}`;
           return !existingRequestCombinations.has(serviceUserCombination);
         });
-  
+
         return res.status(200).json(filteredServices);
       } catch (error) {
         return res.status(500).json(error);
@@ -49,13 +49,12 @@ module.exports = {
       return res.status(404).json({ error: "User not found" });
     }
   },
-  
 
   getServicesForSpecificUser: async (req, res) => {
     const { userId } = req.params;
     const user = await db.User.findOne({ where: { id: userId } });
 
-
+    console.log(userId);
     if (user.isSeller === true) {
       try {
         const clientServices = await db.service.findAll({
@@ -64,9 +63,9 @@ module.exports = {
             userId: userId,
           },
         })
-          return res.status(200).json(clientServices)
-      } 
-      catch(error){
+        return res.status(200).json(clientServices)
+      }
+      catch (error) {
         return res.status(500).json(error);
       }
     } else {
@@ -147,36 +146,36 @@ module.exports = {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      const imageBuffer = req.file.buffer;
-      const imageStream = Readable.from(imageBuffer);
-      const cloudinaryResult = await cloudinary.uploader.upload_stream(
-        {
-          resource_type: "image",
-        },
-        async (error, result) => {
-          if (error) {
-            console.error("errro uploading img", error);
-            res.status(500).json({ error: "Image upload failed" });
-          }
-          console.log(cloudinaryResult);
-          const service = await db.service.create({
-            title,
-            category,
-            description,
-            deliveryTime,
-            feautures,
-            price,
-            userId,
-            job_img: result.secure_url,
-            owner,
-          });
+      // const imageBuffer = req.file.filename;
+      // const imageStream = Readable.from(imageBuffer);
+      // const cloudinaryResult = await cloudinary.uploader.upload_stream(
+      //   {
+      //     resource_type: "image",
+      //   },
+      //   async (error, result) => {
+      //     if (error) {
+      //       console.error("errro uploading img", error);
+      //       res.status(500).json({ error: "Image upload failed" });
+      //     }
+      //     console.log(cloudinaryResult);
+      const service = await db.service.create({
+        title,
+        category,
+        description,
+        deliveryTime,
+        feautures,
+        price,
+        userId,
+        //job_img: result.secure_url,
+        owner,
+      });
 
-          res.status(201).json(service);
-        }
-      );
-      console.log("this is the userid", userId);
+      res.status(201).json(service);
+      // }
+      //);
+      //console.log("this is the userid", userId);
 
-      imageStream.pipe(cloudinaryResult);
+      //imageStream.pipe(cloudinaryResult);
     } catch (error) {
       console.log(error);
       res.status(500).send(error);
@@ -295,10 +294,10 @@ module.exports = {
   },
 
   //when the user clicks on valiate 
-  updatingRequestWhenServiceFinish : async(req,res)=>{
+  updatingRequestWhenServiceFinish: async (req, res) => {
 
     try {
-      const {serviceId ,userId}=req.params
+      const { serviceId, userId } = req.params
       const serviceOnRequest = await db.request.findOne({
         where: {
           serviceId,
@@ -306,10 +305,10 @@ module.exports = {
           user_service_status: "accepted",
         },
       });
-    
+
       if (serviceOnRequest) {
         await serviceOnRequest.update({ isCompleted: true });
-    
+
         res.status(200).json({ message: 'Request updated successfully' });
       } else {
         res.status(404).json({ message: 'Request not found' });
@@ -320,50 +319,50 @@ module.exports = {
     }
   },
 
-  isUserCompleteJob :async(req,res)=>{
-    const {userId,serviceId}=req.params
-    try{
-      const jobCompleted =await db.request.findOne({
-        where :{
+  isUserCompleteJob: async (req, res) => {
+    const { userId, serviceId } = req.params
+    try {
+      const jobCompleted = await db.request.findOne({
+        where: {
           userId,
           serviceId,
         }
       })
-      jobCompleted.isCompleted ? res.json(true) :res.json(false)
-    }catch(error){
+      jobCompleted.isCompleted ? res.json(true) : res.json(false)
+    } catch (error) {
       res.status(500).json(error)
       console.group(error)
     }
   },
-  updateThestars :async(req,res)=>{
-    const {serviceId} =req.params
-    const {stars}=req.body
-    try{
-      const service =await db.service.findByPk(serviceId)
-      if(service){
-        await service.update({totalStars:stars})
-        res.status(200).json({message :"update success"})
-      }else{
-        res.status(404).json({message :"service not found"})
+  updateThestars: async (req, res) => {
+    const { serviceId } = req.params
+    const { stars } = req.body
+    try {
+      const service = await db.service.findByPk(serviceId)
+      if (service) {
+        await service.update({ totalStars: stars })
+        res.status(200).json({ message: "update success" })
+      } else {
+        res.status(404).json({ message: "service not found" })
       }
     }
-    catch(error){
+    catch (error) {
       res.status(500).json(error)
     }
   },
 
-  giveReview :async(req,res)=>{
-    const {serviceId}=req.params
-    const {feedback} =req.body
-    try{
-      const service =await db.service.findByPk(serviceId)
-      if(service){
-        await service.update({serviceReviews:feedback})
-        res.status(200).json({message :"update feedback success"})
-      }else{
-        res.status(404).json({message :"service not found"})
+  giveReview: async (req, res) => {
+    const { serviceId } = req.params
+    const { feedback } = req.body
+    try {
+      const service = await db.service.findByPk(serviceId)
+      if (service) {
+        await service.update({ serviceReviews: feedback })
+        res.status(200).json({ message: "update feedback success" })
+      } else {
+        res.status(404).json({ message: "service not found" })
       }
-    }catch(error){
+    } catch (error) {
       res.status(500).json(error)
     }
   },
@@ -371,7 +370,7 @@ module.exports = {
   averageRatingStars: async (req, res) => {
     try {
       const { userId } = req.params;
-  
+
       const user = await db.User.findOne({
         where: {
           id: userId,
@@ -381,7 +380,7 @@ module.exports = {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const result = await db.service.findOne({
         attributes: [
           [Sequelize.fn("AVG", Sequelize.col("totalStars")), "averageRating"],
@@ -392,9 +391,9 @@ module.exports = {
           },
         },
       });
-  
+
       const averageRating = result.dataValues.averageRating;
-  
+
       res.status(200).json({ averageRating });
     } catch (error) {
       console.error("Error calculating average rating:", error);
@@ -406,66 +405,66 @@ module.exports = {
     const { userId } = req.params;
 
     try {
-        // Find services provided by the user
-        const userServices = await db.service.findAll({
-            where: {
-                userId: userId,
-            },
-        });
+      // Find services provided by the user
+      const userServices = await db.service.findAll({
+        where: {
+          userId: userId,
+        },
+      });
 
-        // Extract service IDs
-        const serviceIds = userServices.map((service) => service.id);
+      // Extract service IDs
+      const serviceIds = userServices.map((service) => service.id);
 
-        // Find service requests for those services
-        const serviceRequests = await db.request.findAll({
-            where: {
-                serviceId: serviceIds,
-                user_service_status: 'accepted',
-                isCompleted: true,
-            },
-        });
+      // Find service requests for those services
+      const serviceRequests = await db.request.findAll({
+        where: {
+          serviceId: serviceIds,
+          user_service_status: 'accepted',
+          isCompleted: true,
+        },
+      });
 
-        // Extract reviewer user IDs
-        const reviewerUserIds = [...new Set(serviceRequests.map((request) => request.userId))];
+      // Extract reviewer user IDs
+      const reviewerUserIds = [...new Set(serviceRequests.map((request) => request.userId))];
 
-        // Fetch reviewer details from the User table
-        const reviewers = await db.User.findAll({
-            where: {
-                id: reviewerUserIds,
-            },
-        });
+      // Fetch reviewer details from the User table
+      const reviewers = await db.User.findAll({
+        where: {
+          id: reviewerUserIds,
+        },
+      });
 
-        // Map service requests to reviews
-        const reviews = serviceRequests.map((request) => {
-            const reviewer = reviewers.find((user) => user.id === request.userId);
-            const service = userServices.find((service) => service.id === request.serviceId);
+      // Map service requests to reviews
+      const reviews = serviceRequests.map((request) => {
+        const reviewer = reviewers.find((user) => user.id === request.userId);
+        const service = userServices.find((service) => service.id === request.serviceId);
 
-            return {
-                id: reviewer.id,
-                userName: reviewer.userName,
-                email: reviewer.email,
-                imgUrl: reviewer.imgUrl,
-                serviceReviews: service.serviceReviews, // Adjust this line based on your data model
-                serviceReviewer :reviewer
-            };
-        });
+        return {
+          id: reviewer.id,
+          userName: reviewer.userName,
+          email: reviewer.email,
+          imgUrl: reviewer.imgUrl,
+          serviceReviews: service.serviceReviews, // Adjust this line based on your data model
+          serviceReviewer: reviewer
+        };
+      });
 
-        res.status(200).json(reviews);
+      res.status(200).json(reviews);
     } catch (error) {
-        console.error('Error fetching user reviews:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error fetching user reviews:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+  }
 
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
+
 
 }
