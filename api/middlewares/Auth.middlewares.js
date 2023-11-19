@@ -43,6 +43,7 @@ module.exports.adminAuthenticated = async (req, res, next) => {
   }
 
   const payload = decodeToken(token);
+  console.log(payload.role, 'jujhttthh')
   if (payload.role !== "admin") {
     return res.status(403).send('Access denied')
   }
