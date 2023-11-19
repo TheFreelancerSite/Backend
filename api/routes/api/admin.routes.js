@@ -13,7 +13,7 @@ router.put('/update', adminAuthenticated, upload.single('image'), updateAdmin);
 router.get('/user', adminAuthenticated, getUserById)
 router.get('/clients', adminAuthenticated, getclients)
 router.get('/freelancers', adminAuthenticated, getfreelancer)
-router.delete('/delete/:userid', adminAuthenticated, deleteUser)
+router.delete('/delete/:userId', deleteUser)
 router.get('/profile/:adminId', adminAuthenticated, getAdmin)
 
 
