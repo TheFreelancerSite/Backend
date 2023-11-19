@@ -14,4 +14,4 @@ router.put('/ban/:userId', banUserById);
 router.put('/unban/:userId', unbanUserById);
 
 
-module.exports = router;
+module.exports = router;    
