@@ -1,5 +1,5 @@
 const db = require("../database/index");
-
+const { Sequelize, Op } = require("sequelize");
 module.exports = {
   addReview: async (req, res) => {
     const { reviewerId, reviewedUserId } = req.params;
@@ -59,6 +59,40 @@ module.exports = {
     } catch (error) {
       res.status(500).json(error);
       throw new Error('Error getting reviews: ' + error.message);
+    }
+  },
+
+  averageRatingStars: async (req, res) => {
+    try {
+      const { userId } = req.params;
+  
+      const user = await db.User.findOne({
+        where: {
+          id: userId,
+        },
+      })  ;
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const result = await db.review.findOne({
+        attributes: [
+          [Sequelize.fn("AVG", Sequelize.col("rating")), "averageRating"],
+        ],
+        where: {
+          reviewedUserId: {
+            [Op.eq]: userId,
+          },
+        },
+      });
+  
+      const averageRating = result.dataValues.averageRating;
+  
+      res.status(200).json({ averageRating });
+    } catch (error) {
+      console.error("Error calculating average rating:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   },
 };

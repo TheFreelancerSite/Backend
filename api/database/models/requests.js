@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     requester: {
       type: DataTypes.STRING,
-    },
+    },    
   }, {
     sequelize,
     modelName: 'requests',
