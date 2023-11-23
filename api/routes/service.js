@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer =require('multer')
 const upload = multer();
-const { addServiceToUser, getServicesForUser, getUserNameOfService, getServiceById, userApplyForJob, usersPending, AcceptApply,getServicesForSpecificUser, isServiceHaveAcceptedUser, getTheAcceptedUser, updatingRequestWhenServiceFinish, isUserCompleteJob, updateThestars, giveReview, averageRatingStars, getAllReviewsForUser} = require("../controllers/service")
+const { addServiceToUser, getServicesForUser, getUserNameOfService, getServiceById, userApplyForJob, usersPending, AcceptApply,getServicesForSpecificUser, isServiceHaveAcceptedUser, getTheAcceptedUser, updatingRequestWhenServiceFinish, isUserCompleteJob, updateThestars, giveReview, averageRatingStars, getAllReviewsForUser, getServiceStatus} = require("../controllers/service")
 
 
 router.get("/getserviceUser/:userId",getServicesForUser)    
@@ -18,6 +18,7 @@ router.post("/add/:userId",upload.single('image'),addServiceToUser)
 router.get("/getServiceById/:serviceId", getServiceById)
 router.get("/averageRatingStars/:userId",averageRatingStars)
 router.get("/getAllReviewsForUser/:userId",getAllReviewsForUser)
+router.get("/getServiceStatus/:serviceId",getServiceStatus)
 router.post("/userApplyForJob/:userId/:serviceId", userApplyForJob)
 router.post("/AcceptApply/:userId/:serviceId",AcceptApply)
 router.put("/validatingService/:userId/:serviceId",updatingRequestWhenServiceFinish)
