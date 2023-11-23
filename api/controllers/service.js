@@ -454,7 +454,26 @@ module.exports = {
       console.error('Error fetching user reviews:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
+  },
+  getServiceStatus: async (req, res) => {
+    const { serviceId } = req.params;
+    try {
+      const service = await db.request.findOne({
+        where: {
+          serviceId: serviceId,
+        },
+      });
+      if (service) {
+        res.status(200).json({status :service.user_service_status ,validated : service.isCompleted});
+      } else {
+        res.status(404).json({ error: "Service not found" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(error);
+    }
   }
+  
 
 
 
