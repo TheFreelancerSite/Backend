@@ -136,7 +136,6 @@ module.exports = {
         category,
         description,
         deliveryTime,
-        job_img,
         feautures,
         price,
         owner,
@@ -146,38 +145,37 @@ module.exports = {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      // const imageBuffer = req.file.filename;
-      // const imageStream = Readable.from(imageBuffer);
-      // const cloudinaryResult = await cloudinary.uploader.upload_stream(
-      //   {
-      //     resource_type: "image",
-      //   },
-      //   async (error, result) => {
-      //     if (error) {
-      //       console.error("errro uploading img", error);
-      //       res.status(500).json({ error: "Image upload failed" });
-      //     }
-      //     console.log(cloudinaryResult);
-      const service = await db.service.create({
-        title,
-        category,
-        description,
-        deliveryTime,
-        feautures,
-        price,
-        userId,
-        //job_img: result.secure_url,
-        owner,
-      });
+      const imageBuffer = req.file.buffer;
+      const imageStream = Readable.from(imageBuffer);
+      const cloudinaryResult = await cloudinary.uploader.upload_stream(
+        {
+          resource_type: "image",
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("error uploading img", error);
+            return res.status(500).json({ error: "Image upload failed" });
+          }
+          console.log(result);
+          const service = await db.service.create({
+            title,
+            category,
+            description,
+            deliveryTime,
+            feautures,
+            price,
+            userId,
+            job_img: result.secure_url,
+            owner,
+          });
 
-      res.status(201).json(service);
-      // }
-      //);
-      //console.log("this is the userid", userId);
+          res.status(201).json(service);
+        }
+      );
 
-      //imageStream.pipe(cloudinaryResult);
+      imageStream.pipe(cloudinaryResult);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).send(error);
     }
   },
