@@ -49,5 +49,5 @@ app.use("/review",reviewRouter)
 app.use("/payment",paymentRouter)
 
 app.listen(3000,()=>{
-    console.log ("server lisnting ")
+    console.log ("server lisnting ")    
 })
